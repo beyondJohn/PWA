@@ -1,0 +1,24 @@
+<form class="form-signin" #loginForm="ngForm" (ngSubmit)="login(loginForm)" style="padding:20px;">
+    <div class="container-fluid">
+      <h2 mat-dialog-title>Login</h2>
+      <div *ngIf="invalidLogin" class="alert alert-danger">Invalid username or password.</div>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Email" type="email" id="username" name="username" ngModel required autofocus>
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Password" type="password" id="password" name="password" ngModel required>
+      </mat-form-field>
+      <br/>
+      <button mat-button mat-raised-button color="primary" type="submit">Sign in</button>
+      
+      <div style="padding: 20px;">Or</div>
+      <button mat-button mat-raised-button color="warn" type="button" (click)="newAcc()" class="btnNewAcc">Create Account</button>
+      <div [ngStyle]="{display: loading! ? 'block' : 'none'}" style="position: absolute; width:100%; top:25%;">
+          <div style="position: relative; width:100%; ">
+            <mat-spinner style="margin: auto;"></mat-spinner>
+          </div>
+        </div>
+    </div>
+  </form>

@@ -1,0 +1,28 @@
+.example-fill-remaining-space {
+    /* This fills the remaining space, by using flexbox. 
+       Every toolbar row uses a flexbox row layout. */
+    flex: 1 1 auto;
+}
+    
+.toolbarMenuItem{
+    /* margin: 5% 0 1%; */
+    padding-top:20px;
+    border: none;
+    background-color: #3f51b5;
+
+}
+.userAccountMenuItem{
+    padding-top: 8px;
+    /* margin: 3% 10px 1%; */
+    border: none;
+    /* text-align: right;
+    width:41px; */
+    background-color: #3f51b5;
+
+    
+}
+.menuBtn{
+    margin:-13px 15px; 
+    height: 41px; 
+    width: 41px;
+}

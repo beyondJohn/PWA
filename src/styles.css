@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+body {
+    margin: 0;
+}
+
+.x2 {
+    transform: scale(2);
+}
+.x1_5 {
+    transform: scale(1.5);
+}
+
+/* center the mat-icon with a parent wrapper, https://stackoverflow.com/questions/43887701/how-to-change-md-icon-size-in-material */
+.centerInParent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.my-bold{
+    font-weight: 600;
+    color: #3F51B5;
+}
+.my-bold-un{
+    font-weight: 600;
+    color: #3F51B5;
+    font-size: 1.8em;
+}
+.my-settings{
+    font-weight: 600;
+    color: #F44336;
+    font-size: 1.8em;
+}
+.my-bold-label{
+    font-weight: 600;
+    color: #3F51B5;
+    font-size: 1.4em;
+}
+
+.my-bold-xlg{
+    font-weight: 600;
+    color: #3F51B5;
+    font-size: 2em;
+}

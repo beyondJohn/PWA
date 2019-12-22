@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>
+        <mat-icon svgIcon="person_add" class="menuBtn x2">Add Person</mat-icon>
+      </h2>
+      <mat-dialog-content class="mat-typography">
+        <div id="divInvitationsNotify" [ngStyle]="{display:preDecision && hasInvitation ? 'block' : 'none'}">
+          <span class="my-bold">You have <span style="color:red">({{count}})</span> Invitation from:</span>
+          <br /><br />
+          <div *ngFor="let invite of filteredNotification" style="text-align: center;">
+            <span class="my-bold-un">{{getInviterName4UI(invite.userNumber)}}</span><br /><br />
+            <button mat-button mat-raised-button color="warn" [ngStyle]="{display:preDecision ? 'inline-block' : 'none'}" (click)="accept(invite.userNumber)">Accept</button>
+            <button mat-button mat-dialog-close mat-raised-button color="accent" [ngStyle]="{display:preDecision ? 'inline-block' : 'none'}"
+              (click)="decline()">Decline</button>
+              <!-- begin try here -->
+              
+              <!-- end try here -->
+          </div>
+          <br />
+      
+      
+        </div>
+        <div id="divAccepted" [ngStyle]="{display:accepted ? 'block' : 'none'}" style="text-align: center;">
+          <span class="my-bold">Share showcases with</span>
+          <br /><br />
+          <span class="my-bold-un">
+            {{shareWith()}}
+          </span>
+          <br /><br />
+          <div *ngFor="let showcase of filteredShowcases" style="text-align:left;">
+            <mat-checkbox  (click)="checkBox(showcase)">{{checkBoxLabels(showcase)}}</mat-checkbox>
+          </div>
+          <br [ngStyle]="{display:checkboxShowcases.length > 0 ? 'block' : 'none'}" />
+          <br [ngStyle]="{display:checkboxShowcases.length > 0 ? 'block' : 'none'}" />
+          <!-- <br [ngStyle]="{display:checkboxShowcases.length > 0 ? 'block' : 'none'}" />
+          <br [ngStyle]="{display:checkboxShowcases.length > 0 ? 'block' : 'none'}" /> -->
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close [ngStyle]="{display:!accepted ? 'block' : 'none'}" cdkFocusInitial
+          mat-raised-button color="primary">cancel</button>
+        <button mat-button mat-dialog-close [ngStyle]="{display:accepted && checkboxShowcases.length == 0 ? 'block' : 'none'}"
+          cdkFocusInitial mat-raised-button color="primary">Finished</button>
+        <button mat-button  mat-raised-button color="warn" type="button" [ngStyle]="{display:checkboxShowcases.length > 0 ? 'block' : 'none'}"
+          (click)="share()" class="btnNewAcc">Share</button>
+      </mat-dialog-actions>

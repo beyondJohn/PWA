@@ -1,0 +1,35 @@
+<button mat-button (click)="openDialog()" style="font-size:10px; color:rgb(2, 216, 216)">via beyondlogical.com</button>
+
+<!-- <mat-card class="example-card" [ngStyle]="{display: showcases.length > 0 ? 'block' : 'none'}">
+  <mat-card-header>
+    <div mat-card-avatar class="icon-image"></div>
+    <mat-card-title>{{description}}</mat-card-title>
+    <mat-card-subtitle>{{date}}</mat-card-subtitle>
+  </mat-card-header>
+  <img mat-card-image [src]="myImg()" alt="meBloggy" id="card" (click)="edit(myImg())">
+  <mat-card-content>
+    <p [innerHTML]="comment">
+    </p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button>CHAT</button>
+    <button mat-button>SHARE</button>
+  </mat-card-actions>
+</mat-card>
+<br />
+<div [ngStyle]="{display: showcases.length > 0 ? 'block' : 'none'}">
+  <div class="showcaseHeader" *ngFor="let showcaseIndex of db; let s = index;">
+    <div (click)="openVert(showcaseTitles(showcases[s]))">
+      {{showcaseTitles(showcases[s])}}
+    </div>
+    <div class="myWorkContent">
+      <img *ngFor="let card of showcaseIndex; let i = index;" src="{{imgAPI}}{{directoryName(card)}}{{imgSrcType}}{{db[s][i].image}}" height="200" (click)="updateImg(s,i)"
+        style="margin:0 4px;">
+    </div>
+  </div>
+</div>
+<div [ngStyle]="{display: showcases.length > 0 ? 'none' : 'block'}" style="position: absolute; width:100%; top:25%;">
+  <div style="position: relative; width:100%; ">
+    <mat-spinner style="margin: auto;"></mat-spinner>
+  </div>
+</div> -->

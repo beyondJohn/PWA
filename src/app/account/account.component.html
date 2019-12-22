@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>Account</h2>
+<mat-dialog-content class="mat-typography">
+    <button style="padding-top: 7px;" mat-button (click)="openPeople()" cdkFocusInitial mat-raised-button
+        color="primary">
+        <table>
+            <tr>
+                <td>
+                    <mat-icon svgIcon="people" class="menuBtn x1_5">People</mat-icon>
+                </td>
+                <td>
+                    <div style="padding-left: 7px; font-size: 16px;">Manage People</div>
+                </td>
+            </tr>
+        </table>
+    </button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="logOut()" mat-dialog-close cdkFocusInitial mat-raised-button color="warn">Log
+        Out</button>
+    <button mat-button mat-dialog-close mat-raised-button color="accent">Close</button>
+</mat-dialog-actions>

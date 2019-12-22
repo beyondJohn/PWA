@@ -1,0 +1,14 @@
+<mat-icon svgIcon="settings" class="my-settings x2">Share Settings</mat-icon>
+<mat-dialog-content class="mat-typography" style="padding-bottom: 20px; padding-top: 30px;">
+  <div id="divCheckboxes">
+      <p class="my-bold">Select Showcases to share:</p>
+    <div *ngFor="let showcase of filteredShowcases" style="text-align:left;">
+      <mat-checkbox (click)="checkBox(showcase)">{{checkBoxLabels(showcase)}}</mat-checkbox>
+    </div>
+    <br /><br />
+    <button mat-button mat-raised-button color="warn" (click)="saveSettings()">Save</button>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close cdkFocusInitial mat-raised-button color="primary">Cancel</button>
+</mat-dialog-actions>
