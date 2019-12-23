@@ -1,0 +1,11 @@
+#complete{
+    color: #ff4081;
+}
+.imgPreview{
+    opacity: 1;
+    z-index: 0;
+}
+.imgPreviewUploading{
+    opacity: .2;
+    z-index: 0;
+}

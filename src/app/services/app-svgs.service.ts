@@ -13,19 +13,19 @@ export class AppSvgsService {
   ) {
     iconRegistry.addSvgIcon(
       'thumbs-up',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/img/examples/thumbup-icon.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/examples/thumbup-icon.svg'));
     iconRegistry.addSvgIcon(
       'dialpad',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/img/examples/dialpadSharp.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/examples/dialpadSharp.svg'));
     iconRegistry.addSvgIcon(
       'voicemail',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/img/examples/voicemailSharp.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/examples/voicemailSharp.svg'));
     iconRegistry.addSvgIcon(
       'notification',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/img/examples/notification.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/examples/notification.svg'));
     iconRegistry.addSvgIcon(
       'menu',
-      sanitizer.bypassSecurityTrustResourceUrl('assets/img/examples/menu.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/examples/menu.svg'));
     iconRegistry.addSvgIcon(
       'home',
       sanitizer.bypassSecurityTrustResourceUrl('assets/materialIconsSVGs/home.svg'));

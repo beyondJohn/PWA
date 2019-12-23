@@ -1,0 +1,32 @@
+<form class="form-signin" #loginForm="ngForm" (ngSubmit)="createAccount(loginForm)" style="padding:20px;">
+    <div class="container-fluid">
+      <h2 mat-dialog-title>Create Account</h2>
+      <div id="loginMessage" style="color: #f44336;"></div>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="User Name" #userName type="string" id="userName" name="userName" ngModel required autofocus>
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Email" #email type="email" id="email" name="email" ngModel required autofocus>
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Password" #password type="password" id="password" name="password" ngModel required>
+      </mat-form-field>
+      <br/>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Confirm Password" #confirmPassword type="password" id="confirmPassword" name="confirmPassword" ngModel required>
+      </mat-form-field>
+      <mat-icon *ngIf="showhide" svgIcon="visible" style="height:100% !important; width:34px !important; cursor: pointer; color:GREEN;" (click)="showhidepassword()" >Visible</mat-icon>
+      <mat-icon *ngIf="!showhide" svgIcon="visibleoff" style="height:100% !important; width:34px !important; cursor: pointer; color:RED;" (click)="showhidepassword()" >Visible</mat-icon>
+      <br/>
+      <br />
+      <button mat-button mat-raised-button color="primary" type="submit">Create Account</button>
+      <div [ngStyle]="{display: loading! ? 'block' : 'none'}" style="position: absolute; width:100%; top:25%;">
+        <div style="position: relative; width:100%; ">
+          <mat-spinner style="margin: auto;"></mat-spinner>
+        </div>
+      </div>
+    </div>
+  </form>

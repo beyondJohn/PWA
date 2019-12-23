@@ -18,6 +18,9 @@ import {
   , MatButtonModule, MatSelectModule, MatCheckboxModule
 
 } from '@angular/material';
+export function jwtTokenGetter() {
+  return localStorage.getItem('token');
+}
 const matModules = [
   MatFormFieldModule, MatInputModule, MatRippleModule, MatIconModule
   , MatDialogModule, MatCardModule, MatProgressSpinnerModule, MatToolbarModule
@@ -42,6 +45,12 @@ import { AccountComponent } from './account/account.component';
 import { PeopleComponent } from './people/people.component';
 import { InvitationsComponent } from './invitations/invitations.component';
 import { ShareSettingsComponent } from './share-settings/share-settings.component';
+import { CreateAccountComponent } from './create-account/create-account.component';
+import { EditComponent } from './edit/edit.component';
+import { NotificationComponent } from './notification/notification.component';
+import { FilterPipe } from './pipes/filter.pipe';
+import { ReversePipe } from './pipes/reverse.pipe';
+import { VertScrollComponent } from './vert-scroll/vert-scroll.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +59,7 @@ import { ShareSettingsComponent } from './share-settings/share-settings.componen
     , HomeComponent
     , FileUploadComponent
     , LoginComponent
-    , AccountComponent, PeopleComponent, InvitationsComponent, ShareSettingsComponent
+    , AccountComponent, PeopleComponent, InvitationsComponent, ShareSettingsComponent, CreateAccountComponent, EditComponent, NotificationComponent, FilterPipe, ReversePipe, VertScrollComponent
   ],
   imports: [
     AppRoutingModule
@@ -64,9 +73,7 @@ import { ShareSettingsComponent } from './share-settings/share-settings.componen
     , ReactiveFormsModule
     , JwtModule.forRoot({
       config: {
-        tokenGetter: function tokenGetter() {
-          return localStorage.getItem('token');
-        },
+        tokenGetter: jwtTokenGetter,
         whitelistedDomains: ['localhost:4200', 'switchmagic.com'],
         blacklistedRoutes: ['http://localhost:3000/auth/login']
       }

@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>EDIT</h2>
+<mat-dialog-content class="mat-typography">
+  <img [src]="data.img" width="100%">
+  <mat-form-field class="example-full-width">
+      <mat-select placeholder="Showcase" [(ngModel)]="selectedValue" [ngModelOptions]="{standalone: true}" [(value)]="selectedValue" name="type">
+          <mat-option *ngFor="let type of showcases" [value]="type.viewValue">
+              {{type.viewValue}}
+          </mat-option>
+      </mat-select>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <input matInput placeholder="Quick Descript" value={{data.description}} [(ngModel)]="describe"
+    [ngModelOptions]="{standalone: true}">
+  </mat-form-field>
+  <br />
+  <mat-form-field class="example-full-width">
+    <input matInput placeholder="Nice Comment" value={{data.comment}} [(ngModel)]="comment"
+    [ngModelOptions]="{standalone: true}">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-raised-button color="warn" (click)="deleteImage(this)" ><mat-icon svgIcon="delete"></mat-icon></button>
+  <button mat-button mat-dialog-close mat-raised-button color="accent">Cancel</button>
+  <button mat-button (click)="updateImage(this)" [mat-dialog-close]="true" cdkFocusInitial mat-raised-button color="primary" >Save</button>
+</mat-dialog-actions>
