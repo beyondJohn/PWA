@@ -83,6 +83,7 @@ import { VertScrollComponent } from './vert-scroll/vert-scroll.component';
   , providers: [AppSvgsService, Config, AuthGuardService, BehaviorSubjectService, NotificationsService, ShowcasesService
   , GetImageDbService ]
   , bootstrap: [AppComponent]
-  , entryComponents: [DialogDefaultComponent, AccountComponent, ShareSettingsComponent, PeopleComponent, InvitationsComponent]
+  , entryComponents: [DialogDefaultComponent, AccountComponent, ShareSettingsComponent, PeopleComponent
+    , InvitationsComponent, EditComponent, NotificationComponent]
 })
 export class AppModule { }
