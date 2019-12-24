@@ -59,7 +59,8 @@ import { VertScrollComponent } from './vert-scroll/vert-scroll.component';
     , HomeComponent
     , FileUploadComponent
     , LoginComponent
-    , AccountComponent, PeopleComponent, InvitationsComponent, ShareSettingsComponent, CreateAccountComponent, EditComponent, NotificationComponent, FilterPipe, ReversePipe, VertScrollComponent
+    , AccountComponent, PeopleComponent, InvitationsComponent, ShareSettingsComponent, CreateAccountComponent
+    , EditComponent, NotificationComponent, FilterPipe, ReversePipe, VertScrollComponent
   ],
   imports: [
     AppRoutingModule

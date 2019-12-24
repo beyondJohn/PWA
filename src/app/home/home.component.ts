@@ -62,12 +62,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     })
     this._behaviorSubject.acceptedInvite.subscribe(event => {
       setTimeout(() => {
-        this._getImageDb.getImages().subscribe(imagesDB => {
-          localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
-          this.processImages(imagesDB);
-          this.processShowcaseTypes(imagesDB);
-          this.processNotifications(imagesDB);
-        });
+        this._getImageDb.refreshImagesDB(this.db);
+        // this._getImageDb.getImages().subscribe(imagesDB => {
+        //   localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
+        //   this.processImages(imagesDB);
+        //   this.processShowcaseTypes(imagesDB);
+        //   this.processNotifications(imagesDB);
+        // });
       }, 200);
     });
     this._showcaseTypesService.showcasesDb.subscribe(showcases => {
@@ -279,12 +280,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // this whole try catch and get images block is a bit of a hack and should be handled more gracefully but I dont have the time or the patience now
       // when user accepts invitation somewhere the shared users showcase titles get lost, but are found if we grab a fresh imagedb from server 
       setTimeout(() => {
-        this._getImageDb.getImages().subscribe(imagesDB => {
-          localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
-          this.processImages(imagesDB);
-          this.processShowcaseTypes(imagesDB);
-          this.processNotifications(imagesDB);
-        });
+        this._getImageDb.refreshImagesDB(this.db);
+        // this._getImageDb.getImages().subscribe(imagesDB => {
+        //   localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
+        //   this.processImages(imagesDB);
+        //   this.processShowcaseTypes(imagesDB);
+        //   this.processNotifications(imagesDB);
+        // });
       }, 100);
     }
     return;
