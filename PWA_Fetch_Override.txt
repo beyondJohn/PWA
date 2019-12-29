@@ -1,0 +1,8 @@
+this.scope.addEventListener('fetch', (event) => {if (event.request.method === 'POST') {
+                return;
+              } this.onFetch(event)});
+			  
+			  if (event.request.method === 'POST') { return; }
+			  
+this.scope.addEventListener('fetch', (event) => {if (event.request.method === 'POST') { return; } this.onFetch(event)});
+

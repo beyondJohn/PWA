@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>MeBloggyPWA</title>
@@ -10,8 +11,33 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
 </head>
+
 <body>
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-analytics.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyCrJ1j5DjRhyGQiqB0ZMb4hMhyKVZRv9RQ",
+      authDomain: "mebloggy-33c13.firebaseapp.com",
+      databaseURL: "https://mebloggy-33c13.firebaseio.com",
+      projectId: "mebloggy-33c13",
+      storageBucket: "mebloggy-33c13.appspot.com",
+      messagingSenderId: "11087891465",
+      appId: "1:11087891465:web:d698b7dbc1f269d87fbcd8",
+      measurementId: "G-1JS54ECKN8"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
 </body>
+
 </html>
