@@ -6,6 +6,7 @@ import { ShowcasesService } from '../services/showcases.service';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Config } from '../config';
+import { CheckBoxModel } from '../models/checkboxmodel';
 
 @Component({
   selector: 'app-share-settings',
@@ -22,8 +23,8 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     , private _httpClient: HttpClient
     , private _config: Config
   ) { }
-  showcases = [];
-  filteredShowcases = [];
+  showcases: CheckBoxModel[] = [];
+  filteredShowcases: CheckBoxModel[] = [];
   checkboxShowcases = [];
   imagesDB;
   ngOnInit() {
@@ -31,7 +32,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
-        this.showcases.push(typeObj);
+        this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
       this.filterShowcases();
     });
@@ -39,7 +40,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // for the dynamic checkboxes, we have to drill into the DOM, if there is a sexier way I'll revise later
     // setTimeout in place do to dev mode change detection error https://github.com/angular/angular/issues/6005
-    setTimeout(() => {this.setCheckBoxesInitValues(); }, 200);
+    setTimeout(() => { this.setCheckBoxesInitValues(); }, 200);
 
   }
 
@@ -67,10 +68,8 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
 
   // this is a complicated  process due to dynamic checkboxes using material
   setCheckBoxesInitValues() {
-    let isChecked = false;
     this.filteredShowcases.forEach(showcase => {
       const showcaseTitle = showcase.viewValue;
-      isChecked = false;
       // get sent invitation from people db
       const db = JSON.parse(this.imagesDB);
       if (db['people']['invitations']['sent'].length > 0) {
@@ -79,14 +78,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
             // get shared showcases
             invitation['sharedShowcases'].forEach(myShowcaseTitle => {
               if (myShowcaseTitle === showcaseTitle) {
-                isChecked = true;
-                // here we hit the DOM for the Material checkbox label, it's found searching all spans and then the checkbox label text
-                const spans = document.getElementsByTagName('span');
-                for (let i = 0; i < spans.length; i++) {
-                  if (spans[i].innerText === showcase.viewValue) {
-                    spans[i].parentElement.click();
-                  }
-                }
+                showcase.checked = true;
                 if (this.checkboxShowcases.indexOf(showcase) === -1) {
                   this.checkboxShowcases.push(showcase);
                 }
@@ -96,7 +88,6 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         });
       }
     });
-    return isChecked;
   }
 
   // save the user preference os which showcases to share with a given connection(person)
@@ -137,7 +128,6 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   }
 
   checkBox(boxName) {
-    console.log(boxName);
     if (this.checkboxShowcases.indexOf(boxName) === -1) {
       this.checkboxShowcases.push(boxName);
     } else {

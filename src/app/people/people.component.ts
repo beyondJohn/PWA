@@ -8,6 +8,7 @@ import { ShowcasesService } from '../services/showcases.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { InvitationsComponent } from '../invitations/invitations.component';
 import { ShareSettingsComponent } from '../share-settings/share-settings.component';
+import { CheckBoxModel } from '../models/checkboxmodel';
 
 @Component({
   selector: 'app-people',
@@ -49,7 +50,7 @@ export class PeopleComponent implements OnInit {
     this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
-        this.showcases.push(typeObj);
+        this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
     });
     this._behaviorSubject.acceptedInvite.subscribe(accepted => {

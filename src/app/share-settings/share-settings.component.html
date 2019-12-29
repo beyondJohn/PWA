@@ -3,7 +3,7 @@
   <div id="divCheckboxes">
       <p class="my-bold">Select Showcases to share:</p>
     <div *ngFor="let showcase of filteredShowcases" style="text-align:left;">
-      <mat-checkbox (click)="checkBox(showcase)">{{checkBoxLabels(showcase)}}</mat-checkbox>
+      <mat-checkbox (click)="checkBox(showcase)" [(ngModel)]="showcase.checked" >{{showcase.viewValue}}</mat-checkbox>
     </div>
     <br /><br />
     <button mat-button mat-raised-button color="warn" (click)="saveSettings()">Save</button>
