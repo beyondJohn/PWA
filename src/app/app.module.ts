@@ -9,6 +9,10 @@ import { RouterModule } from '@angular/router';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { JwtModule } from '@auth0/angular-jwt';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireModule } from '@angular/fire';
 
 import { environment } from '../environments/environment';
 
@@ -51,6 +55,7 @@ import { NotificationComponent } from './notification/notification.component';
 import { FilterPipe } from './pipes/filter.pipe';
 import { ReversePipe } from './pipes/reverse.pipe';
 import { VertScrollComponent } from './vert-scroll/vert-scroll.component';
+import { AsyncPipe } from '../../node_modules/@angular/common';
 
 @NgModule({
   declarations: [
@@ -80,9 +85,14 @@ import { VertScrollComponent } from './vert-scroll/vert-scroll.component';
       }
     })
     , ...matModules
+    ,AngularFireDatabaseModule,
+    AngularFireAuthModule,
+    AngularFireMessagingModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig)
   ]
-  , providers: [AppSvgsService, Config, AuthGuardService, BehaviorSubjectService, NotificationsService, ShowcasesService
-  , GetImageDbService ]
+  , providers: [AppSvgsService, Config, AuthGuardService
+    , BehaviorSubjectService, NotificationsService, ShowcasesService
+  , GetImageDbService, AsyncPipe ]
   , bootstrap: [AppComponent]
   , entryComponents: [DialogDefaultComponent, AccountComponent, ShareSettingsComponent, PeopleComponent
     , InvitationsComponent, EditComponent, NotificationComponent]

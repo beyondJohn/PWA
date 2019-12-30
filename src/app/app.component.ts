@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { trigger, style, animate, transition, query } from '@angular/animations';
 import { MatDialog } from '@angular/material';
 import { AuthGuardService } from './services/auth-guard.service';
 import { AppSvgsService } from './services/app-svgs.service';
 import { AccountComponent } from './account/account.component';
+import { MessagingService } from './services/messaging.service';
 
 @Component({
   selector: 'app-root',
@@ -47,13 +48,20 @@ import { AccountComponent } from './account/account.component';
     ])
   ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'meBloggy';
+  message;
   constructor(
-     public dialog: MatDialog
+    public dialog: MatDialog
     , private _authService: AuthGuardService
     , private svgs: AppSvgsService
-    ) {
+    , private messagingService: MessagingService
+  ) {
+  }
+  ngOnInit() {
+    this.messagingService.requestPermission()
+    this.messagingService.receiveMessage()
+    this.message = this.messagingService.currentMessage
   }
   openAccount() {
     if (this._authService.canActivate()) {
