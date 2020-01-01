@@ -20,6 +20,7 @@ export class MessagingService {
     this.angularFireMessaging.requestToken.subscribe(
       (token) => {
         console.log(token);
+        // add token to user object
       },
       (err) => {
         console.error('Unable to get permission to notify.', err);
@@ -32,5 +33,10 @@ export class MessagingService {
         console.log("new message received. ", payload);
         this.currentMessage.next(payload);
       })
+  }
+  tokenChanged(){
+    this.angularFireMessaging.tokenChanges.subscribe(token => {
+      // token has changed, update user object
+    })
   }
 }
