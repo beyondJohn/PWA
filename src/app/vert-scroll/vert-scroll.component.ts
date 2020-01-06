@@ -5,6 +5,7 @@ import { BehaviorSubjectService } from '../services/behavior-subject.service';
 import { DialogDefaultComponent } from '../dialog-default/dialog-default.component';
 import { EditComponent } from '../edit/edit.component';
 import { ShowcasesService } from '../services/showcases.service';
+import { CheckNetworkService } from '../services/check-network.service';
 
 export interface Showcase {
   value: string;
@@ -29,6 +30,7 @@ export class VertScrollComponent implements OnInit {
     , private http: HttpClient
     , private _behaviorSubject: BehaviorSubjectService
     , private _showcaseTypesService: ShowcasesService
+    , private _checkNetwork: CheckNetworkService
   ) { }
   myPosition = [0];
   imageObjects = [];
@@ -83,6 +85,7 @@ export class VertScrollComponent implements OnInit {
     .subscribe(imagesDB => { this.processImages(imagesDB); });
   }
   ngOnInit() {
+    this._checkNetwork.testNetwork('vert');
     this.activeType = localStorage.getItem("activeType").toUpperCase();
     this.getImages();
     let that = this;

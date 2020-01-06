@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { CheckNetworkService } from '../services/check-network.service';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,11 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(
+    private http: HttpClient
+    , private router: Router
+    , private checkNetwork: CheckNetworkService
+    ) { }
   invalidLogin;
   ngOnInit() {
   }
@@ -18,7 +23,7 @@ export class LoginComponent implements OnInit {
   login(form: NgForm) {
     this.loading = true;
     let credentials = JSON.stringify(form.value);
-    this.http.post("https://switchmagic.com/api/auth/login", credentials, {
+    const loginSubscription = this.http.post("https://switchmagic.com/api/auth/login", credentials, {
       headers: new HttpHeaders({
         "Content-Type": "application/json"
       })
@@ -30,11 +35,21 @@ export class LoginComponent implements OnInit {
       localStorage.setItem("acc", userNumber);
       localStorage.setItem("userName", userName);
       this.invalidLogin = false;
-      this.router.navigate(["/home"]);
+      this.checkNetwork.testNetwork('login');
+      this.router.navigate(["/home"]);    
     }, err => {
-      this.invalidLogin = true;
+      const status = JSON.parse(JSON.stringify(err)).status;
+      if(status === 401){
+        this.invalidLogin = true;
+      }
+      else{
+        alert('Network issue, try again when network is connected;');
+      }
       this.loading = undefined;
+      
     });
+    
+    
   }
   newAcc() {
     this.router.navigate(["/newacc"]);

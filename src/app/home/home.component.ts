@@ -10,6 +10,7 @@ import { ShowcasesService } from '../services/showcases.service';
 import { NotificationsService } from '../services/notifications.service';
 import { Config } from '../config';
 import { GetImageDbService } from '../services/get-image-db.service';
+import { CheckNetworkService } from '../services/check-network.service';
 
 @Component({
   selector: 'app-home',
@@ -28,6 +29,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     , private _notification: NotificationsService
     , private _config: Config
     , private _getImageDb: GetImageDbService
+    , private _checkNetwork: CheckNetworkService
   ) {
     this.description = "";
     this.imgAPI = this._config.urls.getImgAPI;
@@ -44,7 +46,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   imgSrcType = "/thumbMd";
   userId;
   ngOnInit() {
-
+    this._checkNetwork.testNetwork('home');
   }
   afterInit;
   deleted;

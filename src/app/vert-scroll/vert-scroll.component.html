@@ -6,7 +6,7 @@
     <mat-card-title>{{description}}</mat-card-title>
     <mat-card-subtitle>{{date}}</mat-card-subtitle>
   </mat-card-header>
-  <img mat-card-image *ngIf="db.length > 0" [src]="myImg()" alt="kids skatin peir village" id="card" >
+  <img mat-card-image *ngIf="db.length > 0" [src]="myImg()" alt="kids skatin peir village" id="card" crossorigin="anonymous" >
   <mat-card-content>
     <p>
       {{comment}}
@@ -22,7 +22,7 @@
 {{activeType}}
   <div >
     <img *ngFor="let card of db[0]; let i = index;" src="{{db[0][i].url}}" height="100" (click)="updateImg(i)"
-      style="margin:0 4px;">
+      style="margin:0 4px;" crossorigin="anonymous">
   </div>
 </div>
   
