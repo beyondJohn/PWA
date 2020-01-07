@@ -11,6 +11,7 @@ import { NotificationsService } from '../services/notifications.service';
 import { Config } from '../config';
 import { GetImageDbService } from '../services/get-image-db.service';
 import { CheckNetworkService } from '../services/check-network.service';
+import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ import { CheckNetworkService } from '../services/check-network.service';
 })
 
 export class HomeComponent implements OnInit, AfterViewInit {
+  private miniThumbnailDb: ShowcaseImagesDBModel[] = []
   showcases = [];
   constructor(
     public dialog: MatDialog
@@ -53,10 +55,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     let that = this;
     this._behaviorSubject.delete.subscribe(deleted => {
-      if(deleted !== undefined){
+      if (deleted !== undefined) {
         if (deleted['refresh'] != 'refresh') {
           this.deleted = true;
-          console.log(deleted['refresh']);
           this._getImageDb.refreshImagesDB(JSON.parse(deleted['refresh']));
           this._behaviorSubject.refreshDelete({ refresh: 'refresh' });
         }
@@ -65,12 +66,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this._behaviorSubject.acceptedInvite.subscribe(event => {
       setTimeout(() => {
         this._getImageDb.refreshImagesDB(this.db);
-        // this._getImageDb.getImages().subscribe(imagesDB => {
-        //   localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
-        //   this.processImages(imagesDB);
-        //   this.processShowcaseTypes(imagesDB);
-        //   this.processNotifications(imagesDB);
-        // });
       }, 200);
     });
     this._showcaseTypesService.showcasesDb.subscribe(showcases => {
@@ -105,6 +100,32 @@ export class HomeComponent implements OnInit, AfterViewInit {
       }
       this.afterInit = true;
     });
+  }
+  updateImgFromMiniThumbnail(i) {
+    // get image via passed index
+    let showcaseType: string;
+    if (this.miniThumbnailDb.length > 0) {
+      showcaseType = this.miniThumbnailDb[i].type;
+      // get showcase index
+      if (this.showcases.length > 0) {
+        let tempShowcaseIndex = 0;
+        let tempShowcaseAdder = 0;
+        this.showcases.forEach(showcaseObj => {
+          if(showcaseObj['viewValue'] === showcaseType){
+            tempShowcaseIndex = tempShowcaseAdder; 
+          }
+          tempShowcaseAdder++;
+        });
+        this.updateImg(tempShowcaseIndex, i);
+      }
+    }
+  }
+  getShowcaseForMiniThumbnail() {
+    const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
+    const db = JSON.parse(localStorage.getItem('imagesDB'));
+    const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+    this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
+    return this.miniThumbnailDb;
   }
   cleanShowcaseTitle(showcaseTitle) {
     return "Shared By: " + showcaseTitle.split("---")[1] + "-" + showcaseTitle.split("---")[2];
@@ -142,7 +163,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
               var imgName = localStorage.getItem("DefaultImage").split("---")[1];
               for (var r = 0; r < this.db[i].length; r++) {
                 if (this.db[i][r]["timestamp"] == timestamp && this.db[i][r]["image"] == imgName) {
-                    this.myPosition = [i, r];
+                  this.myPosition = [i, r];
                 }
               }
             }
@@ -157,8 +178,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // set string values for description, date, & comment before returning the image url to the view
       //localStorage.setItem("activeType", this.db[this.myPosition[0]][this.myPosition[1]].type);
       if (localStorage.getItem("DefaultImage") != undefined) {
-        if(this.myPosition.length == 0){
-          this.myPosition = [0,0];
+        if (this.myPosition.length == 0) {
+          this.myPosition = [0, 0];
         }
         if (localStorage.getItem("DefaultImage").indexOf(this.db[this.myPosition[0]][this.myPosition[1]].image) != -1) {
           var showcaseType = localStorage.getItem("DefaultImage").split("---")[2].toUpperCase();
@@ -170,8 +191,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 if (this.db[i][r]["timestamp"] == timestamp && this.db[i][r]["image"] == imgName) {
                   if (this.deleted != undefined) {
                     this.myPosition = [0, 0];
-                    localStorage.setItem("DefaultImage", 
-                                this.db[0][0]["timestamp"]
+                    localStorage.setItem("DefaultImage",
+                      this.db[0][0]["timestamp"]
                       + "---" + this.db[0][0]["image"]
                       + "---" + this.db[0][0]["type"]
                       + "---" + this.db[0][0]["description"]
@@ -324,7 +345,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
   edit(img) {
     if (this.db[this.myPosition[0]][this.myPosition[1]].isShared) {
-        // don't allow editing of images that are shared from other users
+      // don't allow editing of images that are shared from other users
     }
     else {
       if (localStorage.getItem('DefaultImage') != undefined) {
