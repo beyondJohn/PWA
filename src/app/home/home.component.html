@@ -15,10 +15,10 @@
     <button mat-button>CHAT</button>
     <button mat-button>SHARE</button>
   </mat-card-actions> -->
-  <div class="myWorkContent">
+  <div id="miniScroll" class="myWorkContent">
   <img *ngFor="let card of getShowcaseForMiniThumbnail(); let i = index;"
     src="{{imgAPI}}{{directoryName(card)}}{{imgSrcType}}{{card.image}}" height="75" (click)="updateImgFromMiniThumbnail(i)"
-    style="margin:0 4px;" crossorigin="anonymous">
+    style="margin:0 4px;" [ngStyle]="{border:currentImageName(card.image)?'solid 4px orange':'none'}" crossorigin="anonymous">
   </div>
 </mat-card>
 <br />
@@ -29,7 +29,7 @@
     </div>
     <div class="myWorkContent">
       <img *ngFor="let card of showcaseIndex; let i = index;"
-        src="{{imgAPI}}{{directoryName(card)}}{{imgSrcType}}{{db[s][i].image}}" height="200" (click)="updateImg(s,i)"
+        src="{{imgAPI}}{{directoryName(card)}}{{imgSrcType}}{{db[s][i].image}}" height="200" (click)="updateImg(s,i,false)"
         style="margin:0 4px;" crossorigin="anonymous">
     </div>
   </div>

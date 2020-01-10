@@ -101,25 +101,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.afterInit = true;
     });
   }
-  updateImgFromMiniThumbnail(i) {
-    // get image via passed index
-    let showcaseType: string;
-    if (this.miniThumbnailDb.length > 0) {
-      showcaseType = this.miniThumbnailDb[i].type;
-      // get showcase index
-      if (this.showcases.length > 0) {
-        let tempShowcaseIndex = 0;
-        let tempShowcaseAdder = 0;
-        this.showcases.forEach(showcaseObj => {
-          if(showcaseObj['viewValue'] === showcaseType){
-            tempShowcaseIndex = tempShowcaseAdder; 
-          }
-          tempShowcaseAdder++;
-        });
-        this.updateImg(tempShowcaseIndex, i);
-      }
-    }
-  }
+
   getShowcaseForMiniThumbnail() {
     const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
     const db = JSON.parse(localStorage.getItem('imagesDB'));
@@ -221,7 +203,27 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
     return this.url;
   }
-  updateImg(s, i) {
+  updateImgFromMiniThumbnail(i) {
+    // get image via passed index
+    let showcaseType: string;
+    if (this.miniThumbnailDb.length > 0) {
+      showcaseType = this.miniThumbnailDb[i].type;
+      // get showcase index
+      if (this.showcases.length > 0) {
+        let tempShowcaseIndex = 0;
+        let tempShowcaseAdder = 0;
+        this.showcases.forEach(showcaseObj => {
+          if (showcaseObj['viewValue'] === showcaseType) {
+            tempShowcaseIndex = tempShowcaseAdder;
+          }
+          tempShowcaseAdder++;
+        });
+        this.updateImg(tempShowcaseIndex, i, true);
+      }
+    }
+  }
+  updateImg(s, i, fromMini) {
+    
     this.myPosition = [s, i];
     var top = document.getElementById("card").offsetTop + 10; //Getting Y of target element
     window.scrollTo({
@@ -229,13 +231,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       behavior: 'smooth',
     });
     if (this.db.length > 0) {
-      // if (localStorage.getItem("DefaultImage") != undefined) {
-      //   if (localStorage.getItem("DefaultImage").indexOf(this.db[this.myPosition[0]][this.myPosition[1]].image) != -1) {
-      //   }
-      // }
-      // else {
-
-      // }
       this.description = this.db[this.myPosition[0]][this.myPosition[1]].description;
       this.date = this.db[this.myPosition[0]][this.myPosition[1]].date;
       this.comment = this.db[this.myPosition[0]][this.myPosition[1]].comment;
@@ -247,7 +242,32 @@ export class HomeComponent implements OnInit, AfterViewInit {
         + "---" + this.db[this.myPosition[0]][this.myPosition[1]].date
         + "---" + this.db[this.myPosition[0]][this.myPosition[1]].comment
       );
-
+      if (!fromMini) {
+        let scrollLength = 0;
+        document.getElementById('miniScroll').scrollLeft = scrollLength;
+        let imageFound = false;
+        const myScrollDivChildImageNodes = document.getElementById('miniScroll').childNodes;
+        console.log('myScrollDivChildImageNodes: ',myScrollDivChildImageNodes);
+        // for some reason angular puts an empty html comment in the miniScroll div
+        // so we skip the first object in the array which is the html comment 
+        for (var image = 1; image < myScrollDivChildImageNodes.length; image++) {
+          const myImage = myScrollDivChildImageNodes[image] as HTMLImageElement;
+          console.log('myImage: ', myImage);
+          const imageWidth = myImage.width;
+          console.log('imageWidth: ', imageWidth);
+          // check if current selected image
+          if (this.currentImageName(myScrollDivChildImageNodes[image])) {
+            imageFound = true;
+          }
+          if (!imageFound) {
+            scrollLength += Number(imageWidth);
+          }
+          else{
+            scrollLength = scrollLength - Number(imageWidth);
+          }
+        }
+        document.getElementById('miniScroll').scrollLeft = scrollLength * .5;
+      }
     }
   }
   processImages(imagesDB) {
@@ -375,6 +395,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // vert screen will use activeType to find the correct collection to show
     localStorage.setItem("activeType", type);
     this._router.navigate(['/vert']);
+  }
+  currentImageName(image) {
+    var imgName = localStorage.getItem("DefaultImage").split("---")[1];
+    return image === imgName;
   }
 
 }
