@@ -6,6 +6,7 @@ import { DialogDefaultComponent } from '../dialog-default/dialog-default.compone
 import { EditComponent } from '../edit/edit.component';
 import { ShowcasesService } from '../services/showcases.service';
 import { CheckNetworkService } from '../services/check-network.service';
+import { GetImageDbService } from '../services/get-image-db.service';
 
 export interface Showcase {
   value: string;
@@ -31,6 +32,7 @@ export class VertScrollComponent implements OnInit {
     , private _behaviorSubject: BehaviorSubjectService
     , private _showcaseTypesService: ShowcasesService
     , private _checkNetwork: CheckNetworkService
+    , private _getImageDb: GetImageDbService
   ) { }
   myPosition = [0];
   imageObjects = [];
@@ -44,12 +46,15 @@ export class VertScrollComponent implements OnInit {
 
   myImg() {
     // check if array of showcases 'db' is loaded before attempting to access each showcase's image objects  
-    if (this.db) {
-      // set string values for description, date, & comment before returning the image url to the view
-      this.description = this.db[0][this.myPosition[0]].description;
-      this.date = this.db[0][this.myPosition[0]].date;
-      this.comment = this.db[0][this.myPosition[0]].comment;
-      return this.db[0][this.myPosition[0]].url;
+    if (this.db.length > 0) {
+      if(this.db[0].length > 0){
+        console.log('this.db: ', this.db);
+        // set string values for description, date, & comment before returning the image url to the view
+        this.description = this.db[0][this.myPosition[0]].description;
+        this.date = this.db[0][this.myPosition[0]].date;
+        this.comment = this.db[0][this.myPosition[0]].comment;
+        return this.db[0][this.myPosition[0]].url;
+      }
     }
     return "";
   }
@@ -70,9 +75,31 @@ export class VertScrollComponent implements OnInit {
     // Begin sort only 1 type of images into showcase array 
     let tempShowcase = [];
     this.imageObjects.forEach(imageObj => {
-      if (imageObj.type.toUpperCase() == this.activeType) {
-        tempShowcase.push(imageObj);
+      ////
+      if (localStorage.getItem('activeType').indexOf('Shared By: ') === -1) {
+        console.log('this should only be run on NON-shared showcases');
+        if (localStorage.getItem("DefaultImage")) {
+          if (localStorage.getItem("DefaultImage").split("---").length === 6) {
+            if (imageObj.type.toUpperCase() == this.activeType) {
+              tempShowcase.push(imageObj);
+            }
+          }
+        }
+      }else{
+        var id = localStorage.getItem("acc");
+          const sharedActiveType = localStorage.getItem('activeType').split(":");
+          console.log('sharedActiveType: ', sharedActiveType)
+          const sharedShowcaseType = sharedActiveType[1].split('-');
+          console.log('sharedShowcaseType: ', sharedShowcaseType)
+          this.activeType = sharedActiveType[1];
+          console.log('this.activeType: ', this.activeType)
+          console.log('imageObj.type.toUpperCase(): ', imageObj.type.toUpperCase());
+          console.log('id + "---" + sharedShowcaseType[0] + "---" + sharedShowcaseType[1]: ', id + "---" + sharedShowcaseType[0].trim() + "---" + sharedShowcaseType[1]);
+          if (imageObj.type.toUpperCase().indexOf(sharedShowcaseType[0].trim() + "---" + sharedShowcaseType[1]) !== -1) {
+            tempShowcase.push(imageObj);
+          }
       }
+      ////
     });
     this.db.push(tempShowcase.reverse());
     this.myPosition = [0];
@@ -80,14 +107,16 @@ export class VertScrollComponent implements OnInit {
     // End sort only 1 type of images into showcase array 
   }
   getImages() {
-    var id = localStorage.getItem("acc");
-    this.http.get('https://switchmagic.com:4111/getImages?id='+ id)
-    .subscribe(imagesDB => { this.processImages(imagesDB); });
+    
   }
   ngOnInit() {
     this._checkNetwork.testNetwork('vert');
     this.activeType = localStorage.getItem("activeType").toUpperCase();
+    if (this.activeType.indexOf('SHARED BY: ') !== -1) {
+
+    }
     this.getImages();
+    this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
     let that = this;
     this._behaviorSubject.elements.subscribe(event => {
       setTimeout(function () {
@@ -98,18 +127,18 @@ export class VertScrollComponent implements OnInit {
     this._showcaseTypesService.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
-        this.showcases.push(typeObj);  
+        this.showcases.push(typeObj);
       });
     });
 
     let showcaseLocalStorage = localStorage.getItem('showcasetypes');
-    if(showcaseLocalStorage){
+    if (showcaseLocalStorage) {
       this.showcases = [];
       let tempShowcaseTypes = JSON.parse(showcaseLocalStorage);
       tempShowcaseTypes.forEach(typeObj => {
-        this.showcases.push(typeObj);  
+        this.showcases.push(typeObj);
       });
-    } 
+    }
 
   }
   openDialog() {
