@@ -103,11 +103,34 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   getShowcaseForMiniThumbnail() {
-    const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
-    const db = JSON.parse(localStorage.getItem('imagesDB'));
-    const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
-    this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
-    return this.miniThumbnailDb;
+    try {
+      const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
+      if (showcaseType !== null) {
+        const db = JSON.parse(localStorage.getItem('imagesDB'));
+        const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+        this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
+        if (this.miniThumbnailDb.length === 0) {
+          const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
+          const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
+          this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
+        }
+        return this.miniThumbnailDb;
+      }
+      else {
+        setTimeout(() => {
+          this._getImageDb.refreshImagesDB(this.db);
+        }, 100);
+      }
+    }
+    catch{
+      // this whole try catch and get images block is a bit of a hack and should be handled more gracefully but I dont have the time or the patience now
+      // when user accepts invitation somewhere the shared users showcase titles get lost, but are found if we grab a fresh imagedb from server 
+      setTimeout(() => {
+        this._getImageDb.refreshImagesDB(this.db);
+      }, 100);
+    }
+    return;
+
   }
   cleanShowcaseTitle(showcaseTitle) {
     return "Shared By: " + showcaseTitle.split("---")[1] + "-" + showcaseTitle.split("---")[2];
@@ -138,18 +161,36 @@ export class HomeComponent implements OnInit, AfterViewInit {
     if (this.isMyImgInit) {
       if (this.db.length > 0) {
         if (localStorage.getItem("DefaultImage")) {
-          var showcaseType = localStorage.getItem("DefaultImage").split("---")[2].toUpperCase();
-          for (var i = 0; i < this.db.length; i++) {
-            if (this.db[i][0].type == showcaseType) {
-              var timestamp = localStorage.getItem("DefaultImage").split("---")[0];
-              var imgName = localStorage.getItem("DefaultImage").split("---")[1];
-              for (var r = 0; r < this.db[i].length; r++) {
-                if (this.db[i][r]["timestamp"] == timestamp && this.db[i][r]["image"] == imgName) {
-                  this.myPosition = [i, r];
+          if (localStorage.getItem("DefaultImage").split("---").length === 6) {
+            var showcaseType = localStorage.getItem("DefaultImage").split("---")[2].toUpperCase();
+            for (var i = 0; i < this.db.length; i++) {
+              if (this.db[i][0].type == showcaseType) {
+                var timestamp = localStorage.getItem("DefaultImage").split("---")[0];
+                var imgName = localStorage.getItem("DefaultImage").split("---")[1];
+                for (var r = 0; r < this.db[i].length; r++) {
+                  if (this.db[i][r]["timestamp"] == timestamp && this.db[i][r]["image"] == imgName) {
+                    this.myPosition = [i, r];
+                  }
                 }
               }
             }
           }
+          else { // shared showcase
+            const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
+            const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
+            for (var i = 0; i < this.db.length; i++) {
+              if (this.db[i][0].type == sharedShowcaseType) {
+                var timestamp = localStorage.getItem("DefaultImage").split("---")[0];
+                var imgName = localStorage.getItem("DefaultImage").split("---")[1];
+                for (var r = 0; r < this.db[i].length; r++) {
+                  if (this.db[i][r]["timestamp"] == timestamp && this.db[i][r]["image"] == imgName) {
+                    this.myPosition = [i, r];
+                  }
+                }
+              }
+            }
+          }
+
         }
         this.isMyImgInit = !this.isMyImgInit;
       }
@@ -206,13 +247,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
   updateImgFromMiniThumbnail(i) {
     // get image via passed index
     let showcaseType: string;
+
+
     if (this.miniThumbnailDb.length > 0) {
-      showcaseType = this.miniThumbnailDb[i].type;
+      if (localStorage.getItem("DefaultImage").split("---").length === 6) {
+        showcaseType = this.miniThumbnailDb[i].type;
+      }
+      else {// shared showcase
+        const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
+        showcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
+      }
       // get showcase index
-      if (this.showcases.length > 0) {
+      const showcasetypes = JSON.parse(localStorage.getItem('showcasetypes'));
+      if (showcasetypes.length > 0) {
         let tempShowcaseIndex = 0;
         let tempShowcaseAdder = 0;
-        this.showcases.forEach(showcaseObj => {
+        showcasetypes.forEach(showcaseObj => {
           if (showcaseObj['viewValue'] === showcaseType) {
             tempShowcaseIndex = tempShowcaseAdder;
           }
@@ -223,8 +273,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
   updateImg(s, i, fromMini) {
-    
+
     this.myPosition = [s, i];
+    console.log('this.myPosition: ', this.myPosition);
+    console.log('this.db: ', this.db);
     var top = document.getElementById("card").offsetTop + 10; //Getting Y of target element
     window.scrollTo({
       top: top,
@@ -247,14 +299,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
         document.getElementById('miniScroll').scrollLeft = scrollLength;
         let imageFound = false;
         const myScrollDivChildImageNodes = document.getElementById('miniScroll').childNodes;
-        console.log('myScrollDivChildImageNodes: ',myScrollDivChildImageNodes);
         // for some reason angular puts an empty html comment in the miniScroll div
         // so we skip the first object in the array which is the html comment 
         for (var image = 1; image < myScrollDivChildImageNodes.length; image++) {
           const myImage = myScrollDivChildImageNodes[image] as HTMLImageElement;
-          console.log('myImage: ', myImage);
           const imageWidth = myImage.width;
-          console.log('imageWidth: ', imageWidth);
           // check if current selected image
           if (this.currentImageName(myScrollDivChildImageNodes[image])) {
             imageFound = true;
@@ -262,7 +311,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           if (!imageFound) {
             scrollLength += Number(imageWidth);
           }
-          else{
+          else {
             scrollLength = scrollLength - Number(imageWidth);
           }
         }
