@@ -12,10 +12,15 @@
       {{comment}}
     </p>
   </mat-card-content>
-  <mat-card-actions>
+  <!-- <mat-card-actions>
     <button mat-button>CHAT</button>
     <button mat-button>SHARE</button>
-  </mat-card-actions>
+  </mat-card-actions> -->
+  <div id="miniScroll" class="myWorkContent" *ngIf="getShowcaseForMiniThumbnail().length > 0">
+    <img *ngFor="let card of getShowcaseForMiniThumbnail(); let i = index;"
+      src="{{db[0][i].url}}" height="75" (click)="updateImg(i)"
+      style="margin:0 4px;" [ngStyle]="{border:currentImageName(card)?'solid 4px orange':'none'}" crossorigin="anonymous">
+    </div>
 </mat-card>
 <br />
 <div *ngIf="db.length > 0">
