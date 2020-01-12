@@ -54,18 +54,40 @@ export class VertScrollComponent implements OnInit {
     try {
       if (localStorage.getItem('activeType') !== null) {
         const sharedActiveType = localStorage.getItem('activeType').split(":");
-        const sharedShowcaseType = sharedActiveType[1].trim();
-        const finalSharedShowcaseTypeArray = sharedShowcaseType.split('-'); 
-        const finalSharedShowcaseType = finalSharedShowcaseTypeArray[0] + "---" + finalSharedShowcaseTypeArray[1]; 
-        const db = JSON.parse(localStorage.getItem('imagesDB'));
-        const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
-        this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase().indexOf(finalSharedShowcaseType) !== -1).reverse();
-        if (this.miniThumbnailDb.length === 0) {
-          const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
-          const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
-          this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
+        if (sharedActiveType.length > 0) {
+          const sharedShowcaseType = sharedActiveType[1].trim();
+          const finalSharedShowcaseTypeArray = sharedShowcaseType.split('-');
+          const finalSharedShowcaseType = finalSharedShowcaseTypeArray[0] + "---" + finalSharedShowcaseTypeArray[1];
+          const db = JSON.parse(localStorage.getItem('imagesDB'));
+          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase().indexOf(finalSharedShowcaseType) !== -1).reverse();
+          if (this.miniThumbnailDb.length === 0) {
+            const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
+            const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
+            this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
+          }
+          return this.miniThumbnailDb;
         }
-        return this.miniThumbnailDb;
+        else {
+          const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
+          if (showcaseType !== null) {
+            const db = JSON.parse(localStorage.getItem('imagesDB'));
+            const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+            this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
+            if (this.miniThumbnailDb.length === 0) {
+              const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
+              const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
+              this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
+            }
+            return this.miniThumbnailDb;
+          }
+          else {
+            setTimeout(() => {
+              this._getImageDb.refreshImagesDB(this.db);
+            }, 100);
+          }
+        }
+
       }
       else {
         setTimeout(() => {
@@ -108,11 +130,11 @@ export class VertScrollComponent implements OnInit {
   processImages(imagesDB) {
     this.db = [];
     this.dbTypesArray = []
-    if(!imagesDB["imagesDB"]){
+    if (!imagesDB["imagesDB"]) {
       this._getImageDb.refreshImagesDB(null);
       return;
     }
-    else{
+    else {
       this.imageObjects = imagesDB["imagesDB"];
       // Begin sort only 1 type of images into showcase array 
       let tempShowcase = [];
@@ -141,7 +163,7 @@ export class VertScrollComponent implements OnInit {
       //this.myImg();
       // End sort only 1 type of images into showcase array 
     }
-    
+
   }
   getImages() {
 
@@ -188,7 +210,7 @@ export class VertScrollComponent implements OnInit {
   // }
   currentImageName(image) {
     return image.image === this.db[0][this.myPosition[0]].image;
-    
+
   }
 
 }
