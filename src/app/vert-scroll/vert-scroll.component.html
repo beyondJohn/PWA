@@ -9,7 +9,7 @@
   <img mat-card-image *ngIf="db.length > 0" [src]="myImg()" alt="kids skatin peir village" id="card" crossorigin="anonymous" >
   <mat-card-content>
     <p>
-      {{comment}}
+      <p [innerHTML]="comment">
     </p>
   </mat-card-content>
   <!-- <mat-card-actions>

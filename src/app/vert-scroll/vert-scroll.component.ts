@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubjectService } from '../services/behavior-subject.service';
 import { DialogDefaultComponent } from '../dialog-default/dialog-default.component';
 import { EditComponent } from '../edit/edit.component';
 import { ShowcasesService } from '../services/showcases.service';
 import { CheckNetworkService } from '../services/check-network.service';
 import { GetImageDbService } from '../services/get-image-db.service';
-// import { Config } from '../config';
 import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
 
 export interface Showcase {
@@ -30,12 +28,10 @@ export class VertScrollComponent implements OnInit {
   ];
   constructor(
     public dialog: MatDialog
-    , private http: HttpClient
     , private _behaviorSubject: BehaviorSubjectService
     , private _showcaseTypesService: ShowcasesService
     , private _checkNetwork: CheckNetworkService
     , private _getImageDb: GetImageDbService
-    // , private _config: Config
   ) { }
   myPosition = [0];
   imageObjects = [];
@@ -46,46 +42,26 @@ export class VertScrollComponent implements OnInit {
   comment = "";
   activeType;
   src = "";
-  // imgAPI = this._config.urls.getImgAPI;
-  // userId = localStorage.getItem("acc");
-  // imgSrcType = "/thumbMd";
   private miniThumbnailDb: ShowcaseImagesDBModel[] = [];
   getShowcaseForMiniThumbnail() {
     try {
       if (localStorage.getItem('activeType') !== null) {
         const sharedActiveType = localStorage.getItem('activeType').split(":");
-        if (sharedActiveType.length > 0) {
+        if (sharedActiveType.length > 1) {
           const sharedShowcaseType = sharedActiveType[1].trim();
           const finalSharedShowcaseTypeArray = sharedShowcaseType.split('-');
           const finalSharedShowcaseType = finalSharedShowcaseTypeArray[0] + "---" + finalSharedShowcaseTypeArray[1];
           const db = JSON.parse(localStorage.getItem('imagesDB'));
           const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
           this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase().indexOf(finalSharedShowcaseType) !== -1).reverse();
-          if (this.miniThumbnailDb.length === 0) {
-            const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
-            const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
-            this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
-          }
           return this.miniThumbnailDb;
         }
         else {
-          const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
-          if (showcaseType !== null) {
-            const db = JSON.parse(localStorage.getItem('imagesDB'));
-            const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
-            this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
-            if (this.miniThumbnailDb.length === 0) {
-              const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
-              const sharedShowcaseType = sharedDefaultImage[2] + '---' + sharedDefaultImage[3] + '---' + sharedDefaultImage[4];
-              this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === sharedShowcaseType).reverse();
-            }
-            return this.miniThumbnailDb;
-          }
-          else {
-            setTimeout(() => {
-              this._getImageDb.refreshImagesDB(this.db);
-            }, 100);
-          }
+          const showcaseType = localStorage.getItem('activeType');
+          const db = JSON.parse(localStorage.getItem('imagesDB'));
+          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
+          return this.miniThumbnailDb;
         }
 
       }
@@ -139,7 +115,6 @@ export class VertScrollComponent implements OnInit {
       // Begin sort only 1 type of images into showcase array 
       let tempShowcase = [];
       this.imageObjects.forEach(imageObj => {
-        ////
         if (localStorage.getItem('activeType').indexOf('Shared By: ') === -1) {
           if (localStorage.getItem("DefaultImage")) {
             if (localStorage.getItem("DefaultImage").split("---").length === 6) {
@@ -156,11 +131,9 @@ export class VertScrollComponent implements OnInit {
             tempShowcase.push(imageObj);
           }
         }
-        ////
       });
       this.db.push(tempShowcase.reverse());
       this.myPosition = [0];
-      //this.myImg();
       // End sort only 1 type of images into showcase array 
     }
 
