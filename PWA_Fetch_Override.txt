@@ -1,8 +1,36 @@
-this.scope.addEventListener('fetch', (event) => {if (event.request.method === 'POST') {
-                return;
-              } this.onFetch(event)});
-			  
-			  if (event.request.method === 'POST') { return; }
-			  
-this.scope.addEventListener('fetch', (event) => {if (event.request.method === 'POST') { return; } this.onFetch(event)});
+this.scope.addEventListener('fetch', (event) => {
+                if (event.request.method === 'POST') {
+                    // on startup/Login-Success/File-Upload-Complete we send a post request to test network connection
+                    // the following predicate looks for the Upload-Image post request, when an image is uploaded we want
+                    // the json db cache to be updated from the server, without isFirstRequestAfterNewImageUpload = true
+                    // the app would always take cache if avaiable and the user would not see the uploaded image unless 
+                    // user cleares cache
+                    if (!event.request.url.includes('testNetwork')) {
+                        isFirstRequestAfterNewImageUpload = true;
+                    }
+                    return;
+                }
+                if (event.request.url.includes('getImages')) {
+
+                    if (isFirstRequestAfterNewImageUpload) {
+                        // getImages is the api which gets the images database json
+                        // here during the home page request loading after an image has 
+                        // been uploaded we make sure the getImages api request goes to the server 
+                        // instead of going to the cache like usual 
+                        isFirstRequestAfterNewImageUpload = false;
+                        event.respondWith(
+                            fetch(event.request).catch(function () {
+                                return caches.match(event.request);
+                            })
+                        );
+                    }
+                    else {
+                        this.onFetch(event)
+                    }
+                }
+                else {
+
+                    this.onFetch(event)
+                }
+            });
 
