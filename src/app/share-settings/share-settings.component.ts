@@ -23,6 +23,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     , private _httpClient: HttpClient
     , private _config: Config
   ) { }
+  inviteeName: string;
   showcases: CheckBoxModel[] = [];
   filteredShowcases: CheckBoxModel[] = [];
   checkboxShowcases = [];
@@ -36,6 +37,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
       });
       this.filterShowcases();
     });
+    this.inviteeName = this.data.userName
   }
   ngAfterViewInit() {
     // for the dynamic checkboxes, we have to drill into the DOM, if there is a sexier way I'll revise later
