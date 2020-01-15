@@ -1,3 +1,4 @@
+C:\Users\owner\projects\meBloggyPWA\node_modules\@angular\service-worker\ngsw-worker.js
 this.scope.addEventListener('fetch', (event) => {
                 if (event.request.method === 'POST') {
                     // on startup/Login-Success/File-Upload-Complete we send a post request to test network connection
