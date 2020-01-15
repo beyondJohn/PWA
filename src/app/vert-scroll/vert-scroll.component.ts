@@ -6,7 +6,7 @@ import { EditComponent } from '../edit/edit.component';
 import { ShowcasesService } from '../services/showcases.service';
 import { CheckNetworkService } from '../services/check-network.service';
 import { GetImageDbService } from '../services/get-image-db.service';
-import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
+import { ImagesDBModel } from '../models/showcaseDbModel';
 
 export interface Showcase {
   value: string;
@@ -42,7 +42,7 @@ export class VertScrollComponent implements OnInit {
   comment = "";
   activeType;
   src = "";
-  private miniThumbnailDb: ShowcaseImagesDBModel[] = [];
+  private miniThumbnailDb: ImagesDBModel[] = [];
   getShowcaseForMiniThumbnail() {
     try {
       if (localStorage.getItem('activeType') !== null) {
@@ -52,14 +52,14 @@ export class VertScrollComponent implements OnInit {
           const finalSharedShowcaseTypeArray = sharedShowcaseType.split('-');
           const finalSharedShowcaseType = finalSharedShowcaseTypeArray[0] + "---" + finalSharedShowcaseTypeArray[1];
           const db = JSON.parse(localStorage.getItem('imagesDB'));
-          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          const imagesDb = db['imagesDB'] as ImagesDBModel[];
           this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase().indexOf(finalSharedShowcaseType) !== -1).reverse();
           return this.miniThumbnailDb;
         }
         else {
           const showcaseType = localStorage.getItem('activeType');
           const db = JSON.parse(localStorage.getItem('imagesDB'));
-          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          const imagesDb = db['imagesDB'] as ImagesDBModel[];
           this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
           return this.miniThumbnailDb;
         }

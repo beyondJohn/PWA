@@ -1,4 +1,4 @@
-export class ShowcaseImagesDBModel {
+export class ImagesDBModel {
     public name: string;
     public image: string;
     public timestamp: string;

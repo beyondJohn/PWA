@@ -11,7 +11,7 @@ import { NotificationsService } from '../services/notifications.service';
 import { Config } from '../config';
 import { GetImageDbService } from '../services/get-image-db.service';
 import { CheckNetworkService } from '../services/check-network.service';
-import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
+import { ImagesDBModel } from '../models/showcaseDbModel';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +20,7 @@ import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
 })
 
 export class HomeComponent implements OnInit, AfterViewInit {
-  private miniThumbnailDb: ShowcaseImagesDBModel[] = [];
+  private miniThumbnailDb: ImagesDBModel[] = [];
   showcases = [];
   constructor(
     public dialog: MatDialog
@@ -107,7 +107,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];
       if (showcaseType !== null) {
         const db = JSON.parse(localStorage.getItem('imagesDB'));
-        const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+        const imagesDb = db['imagesDB'] as ImagesDBModel[];
         this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
         if (this.miniThumbnailDb.length === 0) {
           const sharedDefaultImage = localStorage.getItem('DefaultImage').split("---");
