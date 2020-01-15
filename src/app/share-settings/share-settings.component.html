@@ -5,7 +5,12 @@
     <div *ngFor="let showcase of filteredShowcases" style="text-align:left;">
       <mat-checkbox (click)="checkBox(showcase)" [(ngModel)]="showcase.checked" >{{showcase.viewValue}}</mat-checkbox>
     </div>
-    <br /><br />
+    <br />
+    <p class="my-bold">Show/Hide shared:</p>
+    <div *ngFor="let showcase of filteredSharedShowcases" style="text-align:left;">
+      <mat-checkbox (click)="checkBox(showcase)" [(ngModel)]="showcase.checked" >{{showcase.viewValue}}</mat-checkbox>
+    </div>
+    <br />
     <button mat-button mat-raised-button color="warn" (click)="saveSettings()">Save</button>
   </div>
 </mat-dialog-content>
