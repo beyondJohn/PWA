@@ -7,9 +7,10 @@
     </div>
     <br />
     <p class="my-bold">Show/Hide from {{inviteeName}}:</p>
-    <div *ngFor="let showcase of filteredShowcases" style="text-align:left;">
+    <div *ngFor="let showcase of filteredSharedShowcases" style="text-align:left;">
       <mat-checkbox (click)="checkBox(showcase)" [(ngModel)]="showcase.checked" >{{showcase.viewValue}}</mat-checkbox>
-    </div><br />
+    </div>
+    <br />
     <button mat-button mat-raised-button color="warn" (click)="saveSettings()">Save</button>
   </div>
 </mat-dialog-content>

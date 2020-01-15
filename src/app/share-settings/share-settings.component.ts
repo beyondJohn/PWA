@@ -26,6 +26,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   inviteeName: string;
   showcases: CheckBoxModel[] = [];
   filteredShowcases: CheckBoxModel[] = [];
+  filteredSharedShowcases: CheckBoxModel[] = [];
   checkboxShowcases = [];
   imagesDB;
   ngOnInit() {
@@ -36,6 +37,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
       this.filterShowcases();
+      this.filetrSharedShowcases();
     });
     this.inviteeName = this.data.userName
   }
@@ -66,6 +68,10 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         this.filteredShowcases.push(showcase);
       }
     });
+  }
+  filetrSharedShowcases(){
+    const userNumber = this.data.userNumber;
+    this.filteredSharedShowcases = this.showcases.filter(x => x.viewValue.indexOf(String(userNumber)) !== -1);
   }
 
   // this is a complicated  process due to dynamic checkboxes using material
@@ -136,11 +142,11 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
       this.remove(boxName);
     }
   }
-  checkBoxLabels(showcase) {
-    if (showcase !== undefined) {
-      return showcase['viewValue'];
-    }
-    return;
-  }
+  // checkBoxLabels(showcase) {
+  //   if (showcase !== undefined) {
+  //     return showcase['viewValue'];
+  //   }
+  //   return;
+  // }
 
 }
