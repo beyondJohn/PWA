@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Config } from '../config';
 import { CheckBoxModel } from '../models/checkboxmodel';
+import { GetImageDbService } from '../services/get-image-db.service';
 
 @Component({
   selector: 'app-share-settings',
@@ -22,6 +23,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     , private _showcases: ShowcasesService
     , private _httpClient: HttpClient
     , private _config: Config
+    , private _imagesDb: GetImageDbService
   ) { }
   inviteeName: string;
   showcases: CheckBoxModel[] = [];
@@ -37,7 +39,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
       this.filterShowcases();
-      this.filetrSharedShowcases();
+      this.getFilteredSharedShowcases();
     });
     this.inviteeName = this.data.userName
   }
@@ -69,9 +71,56 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  filetrSharedShowcases(){
+  getFilteredSharedShowcases() {
     const userNumber = this.data.userNumber;
-    this.filteredSharedShowcases = this.showcases.filter(x => x.viewValue.indexOf(String(userNumber)) !== -1);
+    // get uniqueShowcases for user
+    const db = this._imagesDb.getUnfilteredDb();
+    if (db !== null || db !== undefined) {
+      const imagesDb = db['imagesDB'];
+      if (imagesDb.length > 0) {
+        const imageRecordsForCurrentInvitee = imagesDb.filter(x => x.type.indexOf(userNumber) !== -1);
+        console.log('imageRecordsForCurrentInvitee: ', imageRecordsForCurrentInvitee);
+        const uninqueArrayOfShowcasesForCurrentInvitee: CheckBoxModel[] = [];
+        imageRecordsForCurrentInvitee.forEach(imageObj => {
+          if (uninqueArrayOfShowcasesForCurrentInvitee.length === 0) {
+            // if array empty, add object
+            const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
+            uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
+          }
+          else {
+            // inspect checkBoxObjects to build unique invitee showcase array
+            let foundcheckboxObj = false;
+            uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkBoxObj => {
+              if (imageObj.type.split("---")[2] === checkBoxObj.viewValue.split("---")[2]) {
+                foundcheckboxObj = true;
+              }
+            });
+            if (!foundcheckboxObj) {
+              //build shared showcases checkbox model for UI
+              const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
+              uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
+            }
+          }
+
+        });
+        // check or uncheck the boxes dependent on the db preference hide value
+        if (db['preferences']) {
+          const preferencesHideArray = db['preferences']['hide'];
+          const currentInviteeHide = preferencesHideArray.filter(x => x.userNumber === userNumber);
+          if (currentInviteeHide.length > 0) {
+            currentInviteeHide.forEach(hideObj => {
+              uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkboxObj => {
+                if (checkboxObj.viewValue.indexOf(hideObj.userNumber) !== -1
+                  && checkboxObj.viewValue.indexOf(hideObj.showcase) !== -1) {
+                  checkboxObj.checked = false;
+                }
+              })
+            })
+          }
+        }
+        this.filteredSharedShowcases = uninqueArrayOfShowcasesForCurrentInvitee;
+      }
+    }
   }
 
   // this is a complicated  process due to dynamic checkboxes using material
