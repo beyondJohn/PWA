@@ -39,6 +39,7 @@ export class PeopleComponent implements OnInit {
   countConnected: Number;
   inviteUserNumber;
   invitationSent;
+  sharedShowcases = [];
 
   ngOnInit() {
     this._notification.notification.subscribe(notify => {
@@ -61,6 +62,22 @@ export class PeopleComponent implements OnInit {
           this.dialogRef.close();
         }
       }
+    });
+    this.getRawConnectionsShowcases();
+  }
+  getRawConnectionsShowcases() {
+    const acc = localStorage.getItem('acc');
+    this.http.post('https://switchmagic.com:4111/api/buildShowHideList', {
+      userNumber: acc
+    }, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    }).subscribe(response => {
+      this.sharedShowcases = response['back'];
+      console.log('response: ', response);
+    }, err => {
+      console.log('Something went wrong');
     });
   }
   buildInvitations(notify) {
@@ -91,7 +108,9 @@ export class PeopleComponent implements OnInit {
   }
   viewPerson(userNumber, userName) {
     console.log(userNumber);
-    this.dialog.open(ShareSettingsComponent, { data: { userNumber: userNumber, userName: userName } });
+    //get shared showcases
+    //
+    this.dialog.open(ShareSettingsComponent, { data: { userNumber: userNumber, userName: userName, sharedshowcases: this.sharedShowcases } });
   }
   addPeople() {
     this.search = !this.search;

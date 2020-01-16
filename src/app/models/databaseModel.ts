@@ -4,11 +4,11 @@ import { ImagesDBModel } from './showcaseDbModel';
 export class Database {
     public preferences: Preferences;
     public people: People;
-    public imagesDb: ImagesDBModel;
+    public imagesDb: ImagesDBModel[];
     constructor(
         preferences: Preferences,
         people: People,
-        imagesDb: ImagesDBModel
+        imagesDb: ImagesDBModel[]
     ) {
         this.preferences = preferences;
         this.people = people;

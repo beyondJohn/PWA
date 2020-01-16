@@ -1,12 +1,12 @@
-import { Invitations } from './invitationsModel';
-import { Connections } from './connections';
+import { Invitation } from './invitationsModel';
+import { Connection } from './connections';
 export class People {
-    public invitations: Invitations;
-    public connections: Connections
+    public invitations: Invitation;
+    public connections: Connection[]
 
     constructor(
-        invitations: Invitations,
-        connections: Connections
+        invitations: Invitation,
+        connections: Connection[]
     ) {
         this.invitations = invitations;
         this.connections = connections;

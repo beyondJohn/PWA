@@ -1,6 +1,4 @@
-import { stat } from 'fs';
-
-export class Connections {
+export class Connection {
     public inviterNumber: string;
     public inviterName: string;
     public status: string;
