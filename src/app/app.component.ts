@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { trigger, style, animate, transition, query } from '@angular/animations';
+import { trigger, style, animate, transition, query, group, animateChild } from '@angular/animations';
 import { MatDialog } from '@angular/material';
 import { AuthGuardService } from './services/auth-guard.service';
 import { AppSvgsService } from './services/app-svgs.service';
@@ -13,37 +13,28 @@ import { MessagingService } from './services/messaging.service';
   , animations: [
     trigger('routerAnimation', [
       transition('* <=> *', [
-        // Initial state of new route
-        query(':enter',
+        style({ position: 'relative' }),
+        query(':enter, :leave', [
           style({
-            position: 'fixed',
-            width: '100%',
-            height: '100%',
-            opacity: 0,
-            transform: 'translateX(-100%)'
-          }),
-          { optional: true }),
-        // move page off screen right on leave
-        query(':leave',
-          animate('400ms ease',
-            style({
-              position: 'fixed',
-              width: '100%',
-              height: '100%',
-              opacity: 0,
-              transform: 'translateX(100%)'
-            })
-          ),
-          { optional: true }),
-        // move page in screen from left to right
-        query(':enter',
-          animate('400ms ease',
-            style({
-              opacity: 1,
-              transform: 'translateX(0%)'
-            })
-          ),
-          { optional: true }),
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%'
+          })
+        ]),
+        query(':enter', [
+          style({ left: '-100%'})
+        ]),
+        query(':leave', animateChild()),
+        group([
+          query(':leave', [
+            animate('300ms ease-out', style({ left: '100%'}))
+          ]),
+          query(':enter', [
+            animate('300ms ease-out', style({ left: '0%'}))
+          ])
+        ]),
+        query(':enter', animateChild()),
       ])
     ])
   ]
