@@ -97,6 +97,7 @@ export class EditComponent implements OnInit {
       this._behaviorSubject.refreshDelete({ refresh: db["back"] });
       this.dialogRef.close();
     });
+    this._getImageDb.refreshImagesDB([]);
   }
   update(img): Observable<void> {
     var id = localStorage.getItem("acc");
@@ -126,7 +127,8 @@ export class EditComponent implements OnInit {
   updateImage(img) {
     let image = this.data.image.replace(".jpg", "") + "---" + this.data.timestamp;
     this.update(image).subscribe(db => {
-      this._getImageDb.refreshImagesDB(JSON.parse(db["back"]));
+      // this._getImageDb.refreshImagesDB(JSON.parse(db["back"]));
+      this._getImageDb.refreshImagesDB([]);
       this.dialogRef.close();
     });
   }

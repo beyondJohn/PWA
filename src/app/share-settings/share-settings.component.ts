@@ -142,8 +142,10 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         params = params.append('showcases', JSON.stringify(showcases));
         params = params.append('id', id);
         this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updatesharedshowcases', params).subscribe(res => {
-          localStorage.setItem('imagesDB', res['back']);
-          this.imagesDB = localStorage.getItem('imagesDB');
+          this._imagesDb.refreshImagesDB([]);
+          // localStorage.setItem('imagesDB', res['back']);
+          // this.imagesDB = localStorage.getItem('imagesDB');
+          this.imagesDB = res['back'];
           this.dialogRef.close();
         });
       }
@@ -156,8 +158,10 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     params = params.append('id', id);
     params = params.append('filteredSharedShowcases', JSON.stringify(this.filteredSharedShowcases));
     this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updateShowHideShared', params).subscribe(res => {
-      localStorage.setItem('imagesDB', res['back']);
-      this.imagesDB = localStorage.getItem('imagesDB');
+      this._imagesDb.refreshImagesDB(res['back']);
+      // localStorage.setItem('imagesDB', res['back']);
+      // this.imagesDB = localStorage.getItem('imagesDB');
+      this.imagesDB = res['back'];
       this.dialogRef.close();
     });
   }

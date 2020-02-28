@@ -40,7 +40,12 @@ export class GetImageDbService {
   }
   processPreferences(db) {
     const tempImagesDb = [];
+    if(db['imagesDB'] === undefined){
+      db = JSON.parse(db);
+    }
     const dbCopy = db;
+    
+    console.log('inside process Preferences db[imagesDB]: ', db['imagesDB']);
 
     db['imagesDB'].forEach(() => {
       if (db['preferences']) {

@@ -9,6 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { InvitationsComponent } from '../invitations/invitations.component';
 import { ShareSettingsComponent } from '../share-settings/share-settings.component';
 import { CheckBoxModel } from '../models/checkboxmodel';
+import { GetImageDbService } from '../services/get-image-db.service';
 
 @Component({
   selector: 'app-people',
@@ -24,6 +25,7 @@ export class PeopleComponent implements OnInit {
     , public _notification: NotificationsService
     , private _behaviorSubject: BehaviorSubjectService
     , private _showcases: ShowcasesService
+    , private _imagesDb: GetImageDbService
   ) { }
 
   connections = [];
@@ -212,8 +214,9 @@ export class PeopleComponent implements OnInit {
         'Content-Type': 'application/json'
       })
     }).subscribe(response => {
-      console.log('response: ', response);
-      console.log('response["back"]: ', response['back']);
+      // console.log('response: ', response);
+      // console.log('response["back"]: ', response['back']);
+      this._imagesDb.refreshImagesDB([]);
       localStorage.setItem('imagesDB', response['back']);
       this.countSent();
       this.countReceived();
