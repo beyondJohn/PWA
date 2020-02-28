@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubjectService } from '../services/behavior-subject.service';
 import { DialogDefaultComponent } from '../dialog-default/dialog-default.component';
@@ -7,6 +7,7 @@ import { ShowcasesService } from '../services/showcases.service';
 import { CheckNetworkService } from '../services/check-network.service';
 import { GetImageDbService } from '../services/get-image-db.service';
 import { ImagesDBModel } from '../models/showcaseDbModel';
+import { Subscription } from 'rxjs';
 
 export interface Showcase {
   value: string;
@@ -18,7 +19,8 @@ export interface Showcase {
   templateUrl: './vert-scroll.component.html',
   styleUrls: ['../home/home.component.css']
 })
-export class VertScrollComponent implements OnInit {
+export class VertScrollComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
   showcases: Showcase[] = [
     { value: '0', viewValue: 'Family' },
     { value: '1', viewValue: 'Friends' },
@@ -145,21 +147,23 @@ export class VertScrollComponent implements OnInit {
     this._checkNetwork.testNetwork('vert');
     this.activeType = localStorage.getItem("activeType").toUpperCase();
     this.getImages();
-    this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
+    const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
+    this.subscriptions.add(imagesDBBehaviorSubject);
     let that = this;
-    this._behaviorSubject.elements.subscribe(event => {
+    const elementsBehaviorSubject = this._behaviorSubject.elements.subscribe(event => {
       setTimeout(function () {
         that.getImages();
       }, 1000);
 
     });
-    this._showcaseTypesService.showcasesDb.subscribe(showcases => {
+    this.subscriptions.add(elementsBehaviorSubject);
+    const showcasesDBBehaviorSubject = this._showcaseTypesService.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(typeObj);
       });
     });
-
+    this.subscriptions.add(showcasesDBBehaviorSubject);
     let showcaseLocalStorage = localStorage.getItem('showcasetypes');
     if (showcaseLocalStorage) {
       this.showcases = [];
@@ -169,6 +173,9 @@ export class VertScrollComponent implements OnInit {
       });
     }
 
+  }
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
   openDialog() {
     this.dialog.open(DialogDefaultComponent);

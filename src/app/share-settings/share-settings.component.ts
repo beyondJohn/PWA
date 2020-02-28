@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material';
@@ -8,14 +8,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Config } from '../config';
 import { CheckBoxModel } from '../models/checkboxmodel';
 import { GetImageDbService } from '../services/get-image-db.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-share-settings',
   templateUrl: './share-settings.component.html',
   styleUrls: ['./share-settings.component.css']
 })
-export class ShareSettingsComponent implements OnInit, AfterViewInit {
-
+export class ShareSettingsComponent implements OnInit, AfterViewInit, OnDestroy {
+  private subscriptions = new Subscription();
   constructor(
     public dialog: MatDialog
     , public dialogRef: MatDialogRef<ShareSettingsComponent>
@@ -33,7 +34,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   imagesDB;
   ngOnInit() {
     this.imagesDB = localStorage.getItem('imagesDB');
-    this._showcases.showcasesDb.subscribe(showcases => {
+    const showcasesDbBehaviorSubject = this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
@@ -41,6 +42,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
       this.filterShowcases();
       // this.getFilteredSharedShowcases();
     });
+    this.subscriptions.add(showcasesDbBehaviorSubject)
     this.inviteeName = this.data.userName;
     this.buildSharedShowcasesCheckBoxes();
   }
@@ -49,6 +51,9 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     // setTimeout in place do to dev mode change detection error https://github.com/angular/angular/issues/6005
     setTimeout(() => { this.setCheckBoxesInitValues(); }, 200);
 
+  }
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe()
   }
   buildSharedShowcasesCheckBoxes() {
     var rawSharedShowcase = this.data.sharedshowcases;

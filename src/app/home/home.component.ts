@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -12,6 +12,7 @@ import { Config } from '../config';
 import { GetImageDbService } from '../services/get-image-db.service';
 import { CheckNetworkService } from '../services/check-network.service';
 import { ImagesDBModel } from '../models/showcaseDbModel';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,8 @@ import { ImagesDBModel } from '../models/showcaseDbModel';
   styleUrls: ['./home.component.css']
 })
 
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
+  private Subscriptions = new Subscription();
   private miniThumbnailDb: ImagesDBModel[] = [];
   showcases = [];
   constructor(
@@ -54,7 +56,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   deleted;
   ngAfterViewInit() {
     let that = this;
-    this._behaviorSubject.delete.subscribe(deleted => {
+    const deleteBehaviorSubject = this._behaviorSubject.delete.subscribe(deleted => {
       if (deleted !== undefined) {
         if (deleted['refresh'] != 'refresh') {
           this.deleted = true;
@@ -63,11 +65,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
       }
     })
-    this._behaviorSubject.acceptedInvite.subscribe(event => {
+    this.Subscriptions.add(deleteBehaviorSubject);
+    const acceptedInviteBehaviorSubject = this._behaviorSubject.acceptedInvite.subscribe(event => {
       setTimeout(() => {
         this._getImageDb.refreshImagesDB(this.db);
       }, 200);
     });
+    this.Subscriptions.add(acceptedInviteBehaviorSubject);
     this._showcaseTypesService.showcasesDb.subscribe(showcases => {
       that.showcases = [];
 
@@ -76,7 +80,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       });
     });
 
-    this._getImageDb.imagesDB.subscribe(imagesDB => {
+    const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => {
       if (this.afterInit) {
         setTimeout(() => {
           localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
@@ -100,8 +104,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
       }
       this.afterInit = true;
     });
+    this.Subscriptions.add(imagesDBBehaviorSubject);
   }
-
+  ngOnDestroy() {
+    this.Subscriptions.unsubscribe();
+  }
   getShowcaseForMiniThumbnail() {
     try {
       const showcaseType = localStorage.getItem('DefaultImage').split("---")[2];

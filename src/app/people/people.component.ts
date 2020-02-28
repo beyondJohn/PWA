@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -10,14 +10,15 @@ import { InvitationsComponent } from '../invitations/invitations.component';
 import { ShareSettingsComponent } from '../share-settings/share-settings.component';
 import { CheckBoxModel } from '../models/checkboxmodel';
 import { GetImageDbService } from '../services/get-image-db.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-people',
   templateUrl: './people.component.html',
   styleUrls: ['./people.component.css']
 })
-export class PeopleComponent implements OnInit {
-
+export class PeopleComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
   constructor(
     public dialog: MatDialog
     , public dialogRef: MatDialogRef<PeopleComponent>
@@ -44,19 +45,21 @@ export class PeopleComponent implements OnInit {
   sharedShowcases = [];
 
   ngOnInit() {
-    this._notification.notification.subscribe(notify => {
+    const notificationsBehaviorSubject = this._notification.notification.subscribe(notify => {
       // notify is an array of invitations with 4 properties: date, inviterName, status,userNumber
       this.notify = notify;
       this.buildInvitations(notify);
       this.buildConnections();
     });
-    this._showcases.showcasesDb.subscribe(showcases => {
+    this.subscriptions.add(notificationsBehaviorSubject);
+    const showcasesDbBehaviorSubject = this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
     });
-    this._behaviorSubject.acceptedInvite.subscribe(accepted => {
+    this.subscriptions.add(showcasesDbBehaviorSubject);
+    const acceptedINviteBehaviorSubject = this._behaviorSubject.acceptedInvite.subscribe(accepted => {
       if (accepted !== undefined) {
         if (accepted['accept'] === 'accept') {
           // reset accepted value
@@ -65,7 +68,11 @@ export class PeopleComponent implements OnInit {
         }
       }
     });
+    this.subscriptions.add(acceptedINviteBehaviorSubject);
     this.getRawConnectionsShowcases();
+  }
+  ngOnDestroy(){
+    this.subscriptions.unsubscribe();
   }
   getRawConnectionsShowcases() {
     const acc = localStorage.getItem('acc');
