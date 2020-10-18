@@ -1916,7 +1916,17 @@ ${msgIdle}`, { headers: this.adapter.newHeaders({ 'Content-Type': 'text/plain' }
                         // instead of going to the cache like usual 
                         isFirstRequestAfterNewImageUpload = false;
                         event.respondWith(
-                            fetch(event.request).catch(function () {
+                            fetch(event.request)
+                            // START -added 10/18/20 to fix cache updating when new content uploaded
+                            .then(response =>{
+                                // return caches.open(`${this.prefix}:dynamic:${this.config.name}:cache`).then(cache => {
+                                return caches.open(`ngsw:/:1:data:dynamic:dynamicResources:cache`).then(cache => {
+                                    cache.put(event.request.url, response.clone());
+                                    return response;
+                                  });
+                            })
+                            // END -added 10/18/20 to fix cache updating when new content uploaded
+                            .catch(function () {
                                 return caches.match(event.request);
                             })
                         );
