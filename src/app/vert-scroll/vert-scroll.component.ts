@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubjectService } from '../services/behavior-subject.service';
 import { DialogDefaultComponent } from '../dialog-default/dialog-default.component';
@@ -6,7 +6,8 @@ import { EditComponent } from '../edit/edit.component';
 import { ShowcasesService } from '../services/showcases.service';
 import { CheckNetworkService } from '../services/check-network.service';
 import { GetImageDbService } from '../services/get-image-db.service';
-import { ShowcaseImagesDBModel } from '../models/showcaseDbModel';
+import { ImagesDBModel } from '../models/showcaseDbModel';
+import { Subscription } from 'rxjs';
 
 export interface Showcase {
   value: string;
@@ -18,7 +19,8 @@ export interface Showcase {
   templateUrl: './vert-scroll.component.html',
   styleUrls: ['../home/home.component.css']
 })
-export class VertScrollComponent implements OnInit {
+export class VertScrollComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
   showcases: Showcase[] = [
     { value: '0', viewValue: 'Family' },
     { value: '1', viewValue: 'Friends' },
@@ -42,7 +44,7 @@ export class VertScrollComponent implements OnInit {
   comment = "";
   activeType;
   src = "";
-  private miniThumbnailDb: ShowcaseImagesDBModel[] = [];
+  private miniThumbnailDb: ImagesDBModel[] = [];
   getShowcaseForMiniThumbnail() {
     try {
       if (localStorage.getItem('activeType') !== null) {
@@ -52,14 +54,14 @@ export class VertScrollComponent implements OnInit {
           const finalSharedShowcaseTypeArray = sharedShowcaseType.split('-');
           const finalSharedShowcaseType = finalSharedShowcaseTypeArray[0] + "---" + finalSharedShowcaseTypeArray[1];
           const db = JSON.parse(localStorage.getItem('imagesDB'));
-          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          const imagesDb = db['imagesDB'] as ImagesDBModel[];
           this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase().indexOf(finalSharedShowcaseType) !== -1).reverse();
           return this.miniThumbnailDb;
         }
         else {
           const showcaseType = localStorage.getItem('activeType');
           const db = JSON.parse(localStorage.getItem('imagesDB'));
-          const imagesDb = db['imagesDB'] as ShowcaseImagesDBModel[];
+          const imagesDb = db['imagesDB'] as ImagesDBModel[];
           this.miniThumbnailDb = imagesDb.filter(x => x.type.toUpperCase() === showcaseType).reverse();
           return this.miniThumbnailDb;
         }
@@ -145,21 +147,23 @@ export class VertScrollComponent implements OnInit {
     this._checkNetwork.testNetwork('vert');
     this.activeType = localStorage.getItem("activeType").toUpperCase();
     this.getImages();
-    this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
+    const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
+    this.subscriptions.add(imagesDBBehaviorSubject);
     let that = this;
-    this._behaviorSubject.elements.subscribe(event => {
+    const elementsBehaviorSubject = this._behaviorSubject.elements.subscribe(event => {
       setTimeout(function () {
         that.getImages();
       }, 1000);
 
     });
-    this._showcaseTypesService.showcasesDb.subscribe(showcases => {
+    this.subscriptions.add(elementsBehaviorSubject);
+    const showcasesDBBehaviorSubject = this._showcaseTypesService.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(typeObj);
       });
     });
-
+    this.subscriptions.add(showcasesDBBehaviorSubject);
     let showcaseLocalStorage = localStorage.getItem('showcasetypes');
     if (showcaseLocalStorage) {
       this.showcases = [];
@@ -169,6 +173,9 @@ export class VertScrollComponent implements OnInit {
       });
     }
 
+  }
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
   openDialog() {
     this.dialog.open(DialogDefaultComponent);

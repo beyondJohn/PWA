@@ -1,4 +1,4 @@
-export class ShowcaseImagesDBModel {
+export class ImagesDBModel {
     public name: string;
     public image: string;
     public timestamp: string;
@@ -7,6 +7,9 @@ export class ShowcaseImagesDBModel {
     public description: string;
     public date: string;
     public comment: string;
+    public isSeed:boolean;
+    public isShared: boolean;
+    public hide:boolean;
     constructor(
         name: string
         , image: string
@@ -14,7 +17,11 @@ export class ShowcaseImagesDBModel {
         , url: string
         , type: string
         , description: string
-        , date: string, comment: string
+        , date: string
+        , comment: string
+        , isSeed:boolean
+        , isShared: boolean
+        , hide:boolean
     ) {
         this.name = name;
         this.image = image;
@@ -24,6 +31,9 @@ export class ShowcaseImagesDBModel {
         this.description = description;
         this.date = date;
         this.comment = comment;
+        this.isSeed = isSeed;
+        this.isShared = isShared; 
+        this.hide = hide;
     }
 
 }

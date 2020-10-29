@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material';
@@ -7,14 +7,16 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Config } from '../config';
 import { CheckBoxModel } from '../models/checkboxmodel';
+import { GetImageDbService } from '../services/get-image-db.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-share-settings',
   templateUrl: './share-settings.component.html',
   styleUrls: ['./share-settings.component.css']
 })
-export class ShareSettingsComponent implements OnInit, AfterViewInit {
-
+export class ShareSettingsComponent implements OnInit, AfterViewInit, OnDestroy {
+  private subscriptions = new Subscription();
   constructor(
     public dialog: MatDialog
     , public dialogRef: MatDialogRef<ShareSettingsComponent>
@@ -22,6 +24,7 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
     , private _showcases: ShowcasesService
     , private _httpClient: HttpClient
     , private _config: Config
+    , private _imagesDb: GetImageDbService
   ) { }
   inviteeName: string;
   showcases: CheckBoxModel[] = [];
@@ -31,21 +34,53 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   imagesDB;
   ngOnInit() {
     this.imagesDB = localStorage.getItem('imagesDB');
-    this._showcases.showcasesDb.subscribe(showcases => {
+    const showcasesDbBehaviorSubject = this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(new CheckBoxModel(typeObj.viewValue, false, typeObj.value));
       });
       this.filterShowcases();
-      this.filetrSharedShowcases();
+      // this.getFilteredSharedShowcases();
     });
-    this.inviteeName = this.data.userName
+    this.subscriptions.add(showcasesDbBehaviorSubject)
+    this.inviteeName = this.data.userName;
+    this.buildSharedShowcasesCheckBoxes();
   }
   ngAfterViewInit() {
     // for the dynamic checkboxes, we have to drill into the DOM, if there is a sexier way I'll revise later
     // setTimeout in place do to dev mode change detection error https://github.com/angular/angular/issues/6005
     setTimeout(() => { this.setCheckBoxesInitValues(); }, 200);
 
+  }
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe()
+  }
+  buildSharedShowcasesCheckBoxes() {
+    var rawSharedShowcase = this.data.sharedshowcases;
+    // filter for current connection
+    const filteredSharedShowcases = rawSharedShowcase.filter(x => x.userNumber === this.data.userNumber);
+    filteredSharedShowcases.forEach(connectionObj => { //connection object has 2 properties, a string userNumber, and an array showcaseArray
+      connectionObj.showcaseArray.forEach(showcaseName => {
+        this.filteredSharedShowcases.push(new CheckBoxModel(showcaseName, true, this.data.userNumber));
+      });
+
+    });
+    // Uncheck the boxes dependent on the db preference hide value
+    const db = JSON.parse(this.imagesDB);
+    if (db['preferences']) {
+      const preferencesHideArray = db['preferences']['hide'];
+      const currentInviteeHide = preferencesHideArray.filter(x => x.userNumber === this.data.userNumber);
+      if (currentInviteeHide.length > 0) {
+        currentInviteeHide.forEach(hideObj => {
+          this.filteredSharedShowcases.forEach(checkboxObj => {
+            if (checkboxObj.value == hideObj.userNumber
+              && checkboxObj.viewValue.indexOf(hideObj.showcase) !== -1) {
+              checkboxObj.checked = false;
+            }
+          })
+        })
+      }
+    }
   }
 
   // the following is used to update showcases listed in people.invitations.sent.sharedShowcases
@@ -68,10 +103,6 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         this.filteredShowcases.push(showcase);
       }
     });
-  }
-  filetrSharedShowcases(){
-    const userNumber = this.data.userNumber;
-    this.filteredSharedShowcases = this.showcases.filter(x => x.viewValue.indexOf(String(userNumber)) !== -1);
   }
 
   // this is a complicated  process due to dynamic checkboxes using material
@@ -116,11 +147,27 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
         params = params.append('showcases', JSON.stringify(showcases));
         params = params.append('id', id);
         this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updatesharedshowcases', params).subscribe(res => {
-          localStorage.setItem('imagesDB', res['back']);
-          this.imagesDB = localStorage.getItem('imagesDB');
+          this._imagesDb.refreshImagesDB([]);
+          // localStorage.setItem('imagesDB', res['back']);
+          // this.imagesDB = localStorage.getItem('imagesDB');
+          this.imagesDB = res['back'];
           this.dialogRef.close();
         });
       }
+    });
+    // save show hide settings
+    let params = new HttpParams();
+    params = params.append('inviteeNumber', this.data.userNumber);
+    params = params.append('inviteeName', this.data.userName);
+    const id = localStorage.getItem('acc');
+    params = params.append('id', id);
+    params = params.append('filteredSharedShowcases', JSON.stringify(this.filteredSharedShowcases));
+    this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updateShowHideShared', params).subscribe(res => {
+      this._imagesDb.refreshImagesDB(res['back']);
+      // localStorage.setItem('imagesDB', res['back']);
+      // this.imagesDB = localStorage.getItem('imagesDB');
+      this.imagesDB = res['back'];
+      this.dialogRef.close();
     });
   }
 
@@ -150,3 +197,55 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit {
   // }
 
 }
+
+// getFilteredSharedShowcases() {
+  //   const userNumber = this.data.userNumber;
+  //   // get uniqueShowcases for user
+  //   const db = this._imagesDb.getUnfilteredDb();
+  //   if (db !== null || db !== undefined) {
+  //     const imagesDb = db['imagesDB'];
+  //     if (imagesDb.length > 0) {
+  //       const imageRecordsForCurrentInvitee = imagesDb.filter(x => x.type.indexOf(userNumber) !== -1);
+  //       console.log('imageRecordsForCurrentInvitee: ', imageRecordsForCurrentInvitee);
+  //       const uninqueArrayOfShowcasesForCurrentInvitee: CheckBoxModel[] = [];
+  //       imageRecordsForCurrentInvitee.forEach(imageObj => {
+  //         if (uninqueArrayOfShowcasesForCurrentInvitee.length === 0) {
+  //           // if array empty, add object
+  //           const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
+  //           uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
+  //         }
+  //         else {
+  //           // inspect checkBoxObjects to build unique invitee showcase array
+  //           let foundcheckboxObj = false;
+  //           uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkBoxObj => {
+  //             if (imageObj.type.split("---")[2] === checkBoxObj.viewValue.split("---")[2]) {
+  //               foundcheckboxObj = true;
+  //             }
+  //           });
+  //           if (!foundcheckboxObj) {
+  //             //build shared showcases checkbox model for UI
+  //             const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
+  //             uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
+  //           }
+  //         }
+
+  //       });
+  //       // check or uncheck the boxes dependent on the db preference hide value
+  //       if (db['preferences']) {
+  //         const preferencesHideArray = db['preferences']['hide'];
+  //         const currentInviteeHide = preferencesHideArray.filter(x => x.userNumber === userNumber);
+  //         if (currentInviteeHide.length > 0) {
+  //           currentInviteeHide.forEach(hideObj => {
+  //             uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkboxObj => {
+  //               if (checkboxObj.viewValue.indexOf(hideObj.userNumber) !== -1
+  //                 && checkboxObj.viewValue.indexOf(hideObj.showcase) !== -1) {
+  //                 checkboxObj.checked = false;
+  //               }
+  //             })
+  //           })
+  //         }
+  //       }
+  //       this.filteredSharedShowcases = uninqueArrayOfShowcasesForCurrentInvitee;
+  //     }
+  //   }
+  // }
