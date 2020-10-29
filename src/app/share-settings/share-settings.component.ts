@@ -148,8 +148,6 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit, OnDestroy 
         params = params.append('id', id);
         this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updatesharedshowcases', params).subscribe(res => {
           this._imagesDb.refreshImagesDB([]);
-          // localStorage.setItem('imagesDB', res['back']);
-          // this.imagesDB = localStorage.getItem('imagesDB');
           this.imagesDB = res['back'];
           this.dialogRef.close();
         });
@@ -164,8 +162,6 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit, OnDestroy 
     params = params.append('filteredSharedShowcases', JSON.stringify(this.filteredSharedShowcases));
     this._httpClient.post<void>(this._config.urls.apiEndPoint + '/updateShowHideShared', params).subscribe(res => {
       this._imagesDb.refreshImagesDB(res['back']);
-      // localStorage.setItem('imagesDB', res['back']);
-      // this.imagesDB = localStorage.getItem('imagesDB');
       this.imagesDB = res['back'];
       this.dialogRef.close();
     });
@@ -189,63 +185,4 @@ export class ShareSettingsComponent implements OnInit, AfterViewInit, OnDestroy 
       this.remove(boxName);
     }
   }
-  // checkBoxLabels(showcase) {
-  //   if (showcase !== undefined) {
-  //     return showcase['viewValue'];
-  //   }
-  //   return;
-  // }
-
 }
-
-// getFilteredSharedShowcases() {
-  //   const userNumber = this.data.userNumber;
-  //   // get uniqueShowcases for user
-  //   const db = this._imagesDb.getUnfilteredDb();
-  //   if (db !== null || db !== undefined) {
-  //     const imagesDb = db['imagesDB'];
-  //     if (imagesDb.length > 0) {
-  //       const imageRecordsForCurrentInvitee = imagesDb.filter(x => x.type.indexOf(userNumber) !== -1);
-  //       console.log('imageRecordsForCurrentInvitee: ', imageRecordsForCurrentInvitee);
-  //       const uninqueArrayOfShowcasesForCurrentInvitee: CheckBoxModel[] = [];
-  //       imageRecordsForCurrentInvitee.forEach(imageObj => {
-  //         if (uninqueArrayOfShowcasesForCurrentInvitee.length === 0) {
-  //           // if array empty, add object
-  //           const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
-  //           uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
-  //         }
-  //         else {
-  //           // inspect checkBoxObjects to build unique invitee showcase array
-  //           let foundcheckboxObj = false;
-  //           uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkBoxObj => {
-  //             if (imageObj.type.split("---")[2] === checkBoxObj.viewValue.split("---")[2]) {
-  //               foundcheckboxObj = true;
-  //             }
-  //           });
-  //           if (!foundcheckboxObj) {
-  //             //build shared showcases checkbox model for UI
-  //             const checkBoxObj: CheckBoxModel = new CheckBoxModel(imageObj.type, true, userNumber);
-  //             uninqueArrayOfShowcasesForCurrentInvitee.push(checkBoxObj);
-  //           }
-  //         }
-
-  //       });
-  //       // check or uncheck the boxes dependent on the db preference hide value
-  //       if (db['preferences']) {
-  //         const preferencesHideArray = db['preferences']['hide'];
-  //         const currentInviteeHide = preferencesHideArray.filter(x => x.userNumber === userNumber);
-  //         if (currentInviteeHide.length > 0) {
-  //           currentInviteeHide.forEach(hideObj => {
-  //             uninqueArrayOfShowcasesForCurrentInvitee.forEach(checkboxObj => {
-  //               if (checkboxObj.viewValue.indexOf(hideObj.userNumber) !== -1
-  //                 && checkboxObj.viewValue.indexOf(hideObj.showcase) !== -1) {
-  //                 checkboxObj.checked = false;
-  //               }
-  //             })
-  //           })
-  //         }
-  //       }
-  //       this.filteredSharedShowcases = uninqueArrayOfShowcasesForCurrentInvitee;
-  //     }
-  //   }
-  // }

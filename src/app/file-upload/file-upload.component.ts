@@ -211,8 +211,6 @@ export class FileUploadComponent implements OnInit, AfterViewInit {
             percent > 98 ? document.getElementById('complete').innerText = 'COMPLETING...' : document.getElementById('complete').innerText = percent + '% COMPLETE';
           }
           else if (event['type'] > 1) {
-
-            console.log("event: ", event);
             if (event["body"] != undefined) {
               if (event["body"]["db"] != undefined) {
                 var db = event["body"]["db"];

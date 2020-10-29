@@ -19,7 +19,6 @@ export class MessagingService {
   requestPermission() {
     this.angularFireMessaging.requestToken.subscribe(
       (token) => {
-        console.log(token);
         // add token to user object
       },
       (err) => {
@@ -30,7 +29,6 @@ export class MessagingService {
   receiveMessage() {
     this.angularFireMessaging.messages.subscribe(
       (payload) => {
-        console.log("new message received. ", payload);
         this.currentMessage.next(payload);
       })
   }

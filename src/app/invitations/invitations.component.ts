@@ -81,19 +81,15 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     this.filteredShowcases = [];
     this.showcases.forEach(showcase => {
       if (showcase.viewValue.indexOf('---') === -1) {
-        console.log('72invitations.ts-showcase.viewValue: ', showcase.viewValue);
         this.filteredShowcases.push(showcase);
       }
     });
   }
   getInviterName4UI(inviterNumber) {
     let userName;
-    console.log('inviterNumber: ', inviterNumber);
     this.notifications.forEach(notification => {
-      console.log('notification: ', notification.userNumber);
       if (inviterNumber === notification.userNumber) {
         this.inviterName = notification.inviterName;
-        console.log('notification.inviterName.toUpperCase(): ', notification.inviterName.toUpperCase());
         userName = this.inviterName.toUpperCase();
       }
     });
@@ -130,10 +126,6 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     // Initialize Params Object
     let params = new HttpParams();
     // Begin assigning parameters
-    console.log('inviter', inviter);
-    console.log('status', status);
-    console.log('id', id);
-    console.log('inviterName', this.inviterName);
     params = params.append('inviter', inviter);
     params = params.append('status', status);
     params = params.append('id', id);

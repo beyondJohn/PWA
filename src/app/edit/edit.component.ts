@@ -133,6 +133,6 @@ export class EditComponent implements OnInit {
     });
   }
   imgClick() {
-    console.log("image click");
+    
   }
 }

@@ -84,7 +84,6 @@ export class PeopleComponent implements OnInit, OnDestroy {
       })
     }).subscribe(response => {
       this.sharedShowcases = response['back'];
-      console.log('response: ', response);
     }, err => {
       console.log('Something went wrong');
     });
@@ -112,13 +111,10 @@ export class PeopleComponent implements OnInit, OnDestroy {
       });
   }
   viewInvitation(inviterNumber) {
-    console.log('notify: ', this.notify);
     this.dialog.open(InvitationsComponent, { data: { notify: this.notify, inviterNumber: inviterNumber } });
   }
   viewPerson(userNumber, userName) {
-    console.log(userNumber);
     //get shared showcases
-    //
     this.dialog.open(ShareSettingsComponent, { data: { userNumber: userNumber, userName: userName, sharedshowcases: this.sharedShowcases } });
   }
   addPeople() {
@@ -189,7 +185,6 @@ export class PeopleComponent implements OnInit, OnDestroy {
             }
           });
           if (response['found']) {
-            // let searchTerm = JSON.stringify(form.value);
             this.personFound = true;
             this.personFoundStage1 = true;
             this.userName = form.value['username'];
@@ -221,8 +216,6 @@ export class PeopleComponent implements OnInit, OnDestroy {
         'Content-Type': 'application/json'
       })
     }).subscribe(response => {
-      // console.log('response: ', response);
-      // console.log('response["back"]: ', response['back']);
       this._imagesDb.refreshImagesDB([]);
       localStorage.setItem('imagesDB', response['back']);
       this.countSent();
