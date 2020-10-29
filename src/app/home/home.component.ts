@@ -51,6 +51,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   userId;
   ngOnInit() {
     this._checkNetwork.testNetwork('home');
+    var storedImage = localStorage.getItem('DefaultImage');
+    if (storedImage != null) {
+      this.description = storedImage.split('---')[3];
+      this.date = storedImage.split('---')[4];
+      this.comment = storedImage.split('---')[5];
+    }
+    if(localStorage.getItem('DefaultImageURL') !== null){
+      this.url = localStorage.getItem('DefaultImageURL')
+    }
   }
   afterInit;
   deleted;
@@ -82,24 +91,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => {
       if (this.afterInit) {
+        var storedImage = localStorage.getItem('DefaultImage');
+        if (storedImage != null) {
+          this.description = storedImage.split('---')[3];
+          this.date = storedImage.split('---')[4];
+          this.comment = storedImage.split('---')[5];
+        }
         setTimeout(() => {
           localStorage.setItem('imagesDB', JSON.stringify(imagesDB));
-
           this.processImages(imagesDB);
           this.processShowcaseTypes(imagesDB);
           this.processNotifications(imagesDB);
-          //if (localStorage.getItem("DefaultImage")) {
-          var storedImage = localStorage.getItem('DefaultImage');
-          if (storedImage != null) {
-            this.description = storedImage.split('---')[3];
-            this.date = storedImage.split('---')[4];
-            this.comment = storedImage.split('---')[5];
-          }
 
-          //}
-
-          // this.processShowcaseTypes(imagesDB);
-          //this.processNotifications(imagesDB);
         }, 200);
       }
       this.afterInit = true;
@@ -245,6 +248,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.image = this.db[this.myPosition[0]][this.myPosition[1]].image;
           this.timestamp = this.db[this.myPosition[0]][this.myPosition[1]].timestamp;
           this.url = this.db[this.myPosition[0]][this.myPosition[1]].url;
+          localStorage.setItem('DefaultImageURL',this.url);
         }
       }
       //return 

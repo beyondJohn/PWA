@@ -77,7 +77,7 @@ export class CreateAccountComponent implements OnInit {
       .subscribe(response => {
         localStorage.setItem("acc", id);
         this.login(form);
-      });
+      }, error => console.log('error: ', error));
   }
   login(form: NgForm) {
     let credentials = JSON.stringify(form.value);

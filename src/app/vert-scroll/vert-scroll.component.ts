@@ -137,6 +137,15 @@ export class VertScrollComponent implements OnInit, OnDestroy {
       this.db.push(tempShowcase.reverse());
       this.myPosition = [0];
       // End sort only 1 type of images into showcase array 
+      
+      setTimeout(()=>{
+        var top = document.getElementById("card").offsetTop; //Getting Y of target element
+        window.scrollTo({
+          top: top,
+          behavior: 'smooth',
+        });
+      },1000)
+      
     }
 
   }
