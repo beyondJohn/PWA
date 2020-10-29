@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { ShowcasesService } from '../services/showcases.service';
 import { Observable } from 'rxjs';
@@ -8,14 +8,15 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { GetImageDbService } from '../services/get-image-db.service';
 import { BehaviorSubjectService } from '../services/behavior-subject.service';
 import { NotificationsService } from '../services/notifications.service';
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-invitations',
   templateUrl: './invitations.component.html',
   styleUrls: ['./invitations.component.css']
 })
-export class InvitationsComponent implements OnInit {
-
+export class InvitationsComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
   notifications = [];
   count = 0;
   constructor(
@@ -58,13 +59,17 @@ export class InvitationsComponent implements OnInit {
   acceptReturnedDb;
   ngOnInit() {
     this.preDecision = true;
-    this._showcases.showcasesDb.subscribe(showcases => {
+    const showcasesDbBehaviorSubject = this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(typeObj);
       });
       this.filterShowcases();
     });
+    this.subscriptions.add(showcasesDbBehaviorSubject);
+  }
+  ngOnDestroy(){
+    this.subscriptions.unsubscribe();
   }
   shareWith() {
     if (this.inviterName !== undefined) {

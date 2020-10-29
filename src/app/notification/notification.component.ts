@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { ShowcasesService } from '../services/showcases.service';
 import { HttpClient } from '@angular/common/http';
@@ -6,13 +6,15 @@ import { Config } from '../config';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material';
 import { PeopleComponent } from '../people/people.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.css']
 })
-export class NotificationComponent implements OnInit {
+export class NotificationComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
   notifications = [];
   count = 0;
   constructor(
@@ -35,12 +37,16 @@ export class NotificationComponent implements OnInit {
   showcases = [];
   hasInvitation;
   ngOnInit() {
-    this._showcases.showcasesDb.subscribe(showcases => {
+    const showcasesDbBehaviorSubject = this._showcases.showcasesDb.subscribe(showcases => {
       this.showcases = [];
       showcases['showcaseTypesArray'].forEach(typeObj => {
         this.showcases.push(typeObj);
       });
     });
+    this.subscriptions.add(showcasesDbBehaviorSubject);
+  }
+  ngOnDestroy(){
+    this.subscriptions.unsubscribe();
   }
   manageInvitations() {
     this.dialog.open(PeopleComponent);
