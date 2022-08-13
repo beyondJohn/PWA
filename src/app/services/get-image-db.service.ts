@@ -40,42 +40,44 @@ export class GetImageDbService {
   }
   processPreferences(db) {
     const tempImagesDb = [];
-    if(db['imagesDB'] === undefined){
-      db = JSON.parse(db);
-    }
-    const dbCopy = db;
+    if (db['imagesDB'] !== undefined) {
+      const dbCopy = db;
 
-    db['imagesDB'].forEach(() => {
-      if (db['preferences']) {
-        if (db['preferences']['hide']) {
-          db['preferences']['hide'].forEach(hideRecord => {
-            if (this.preferences.indexOf(hideRecord.userNumber + '--' + hideRecord.showcase) === -1) {
-              this.preferences.push(hideRecord.userNumber + '--' + hideRecord.showcase);
-            }
-          });
+      db['imagesDB'].forEach(() => {
+        if (db['preferences']) {
+          if (db['preferences']['hide']) {
+            db['preferences']['hide'].forEach(hideRecord => {
+              if (this.preferences.indexOf(hideRecord.userNumber + '--' + hideRecord.showcase) === -1) {
+                this.preferences.push(hideRecord.userNumber + '--' + hideRecord.showcase);
+              }
+            });
+          }
         }
-      }
-    });
-    db['imagesDB'].forEach(imageObject => {
-      let shouldHide = false;
-      if (imageObject.isShared) {
-        if (this.preferences.length > 0) {
-          //401551
-          this.preferences.forEach(preference => {
-            if (preference === imageObject.type.split('---')[0] + '--' + imageObject.type.split('---')[2]) {
-              shouldHide = true;
-            }
-          });
+      });
+      db['imagesDB'].forEach(imageObject => {
+        let shouldHide = false;
+        if (imageObject.isShared) {
+          if (this.preferences.length > 0) {
+            //401551
+            this.preferences.forEach(preference => {
+              if (preference === imageObject.type.split('---')[0] + '--' + imageObject.type.split('---')[2]) {
+                shouldHide = true;
+              }
+            });
+          }
+          if (!shouldHide) {
+            tempImagesDb.push(imageObject);
+          }
         }
-        if (!shouldHide) {
+        else {
           tempImagesDb.push(imageObject);
         }
-      }
-      else {
-        tempImagesDb.push(imageObject);
-      }
-    });
-    dbCopy['imagesDB'] = tempImagesDb;
-    return dbCopy;
+      });
+      dbCopy['imagesDB'] = tempImagesDb;
+      return dbCopy;
+    }
+    else{
+      return db;
+    }
   }
 }

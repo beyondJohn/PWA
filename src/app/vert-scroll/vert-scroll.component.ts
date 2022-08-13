@@ -119,11 +119,11 @@ export class VertScrollComponent implements OnInit, OnDestroy {
       this.imageObjects.forEach(imageObj => {
         if (localStorage.getItem('activeType').indexOf('Shared By: ') === -1) {
           if (localStorage.getItem("DefaultImage")) {
-            if (localStorage.getItem("DefaultImage").split("---").length === 6) {
+            //if (localStorage.getItem("DefaultImage").split("---").length === 6) {
               if (imageObj.type.toUpperCase() == this.activeType) {
                 tempShowcase.push(imageObj);
               }
-            }
+            //}
           }
         } else {
           const sharedActiveType = localStorage.getItem('activeType').split(":");
@@ -156,7 +156,9 @@ export class VertScrollComponent implements OnInit, OnDestroy {
     this._checkNetwork.testNetwork('vert');
     this.activeType = localStorage.getItem("activeType").toUpperCase();
     this.getImages();
-    const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => { this.processImages(imagesDB); });
+    const imagesDBBehaviorSubject = this._getImageDb.imagesDB.subscribe(imagesDB => { 
+      this.processImages(imagesDB); 
+    });
     this.subscriptions.add(imagesDBBehaviorSubject);
     let that = this;
     const elementsBehaviorSubject = this._behaviorSubject.elements.subscribe(event => {
